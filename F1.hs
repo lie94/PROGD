@@ -1,4 +1,4 @@
--- Gjord utav Felix Hedenström och Jonathan Rinnarv
+-- Gjord utav Jonathan Rinnarv och Felix hjälpte till
 module F1 where
 import Data.Char
 import Data.List
