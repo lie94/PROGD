@@ -1,4 +1,4 @@
--- Gjord utav Jonathan Rinnarv och Felix hjälpte till
+-- Gjord utav Felix Hedenström och Jonathan Rinnarv
 module F1 where
 import Data.Char
 import Data.List
@@ -38,11 +38,11 @@ medellangd s = 	if not (isAlpha(s !! 0))
 				else search s 0 0 False	
 			where
 			search (c:s) wordCount letterCount newWord -- newWord is False if the last char was an alpha
-				| isAlpha(c)	= search s wordCount (letterCount + 1) False
-				| otherwise 	= if newWord then search s wordCount letterCount True else search s (wordCount + 1) letterCount True
+				| isAlpha(c)	= search s wordCount (letterCount + 1) False -- If the first character in the string is a part of the alphabet the letter count adds 1 and the subfunction calls itselt
+				| otherwise 	= if newWord then search s wordCount letterCount True else search s (wordCount + 1) letterCount True -- If the last char was a part of the alphabet, a new word was written
 			search [] wordCount letterCount newWord -- If the list is empty, return the ratio letters / words
-				| newWord 	= letterCount / (wordCount)
-				| otherwise 	= letterCount / (wordCount + 1)
+				| newWord 	= letterCount / (wordCount) -- If the list is empty and the last char was not part of the alphabet, return the ratio
+				| otherwise 	= letterCount / (wordCount + 1)	-- If the list is empty and the last char was  part of the alphabet, add one to the wordcount and return the ratio
 
 {-medellangd s = 	if not (isAlpha(s !! 0)) -- If the string starts with a non alpha 
 		then fromIntegral (length ([0 | x <- s, isAlpha(x)]) ) / fromIntegral ((length [0 | i <- [1..((length s) - 1)], isAlpha(s !! i) && (not (isAlpha(s !! (i - 1))))])) 		
