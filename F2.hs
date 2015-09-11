@@ -7,7 +7,7 @@ string2seq n s = if isACGT(s) then MolSeq n s True
 
 -- Check if string only contains ACGT
 isACGT :: String -> Bool
-isACGT [] = True
+isACGT [] = True -- Kanske bör ändras till isACGT (x:[]) = True
 isACGT (a:s) = if (elem a "ACGT") then isACGT(s)
 		else False  
 
@@ -17,6 +17,9 @@ seqName (MolSeq n _ _) = n
 seqSequence :: MolSeq -> String
 seqSequence (MolSeq _ s _) = s 
 
+-- Checks if a MolSeq is of type DNA
+isDNA :: MolSeq -> Bool
+isDNA (MolSeq _ _ b) = b
 seqLength :: MolSeq -> Int
 seqLength (MolSeq _ s _) = length s 
 
@@ -37,9 +40,13 @@ formulaCheck b alfa
 		| alfa <= 0.94 = (-19 / 20) * log(1 - 20 * alfa / 19) -- If it's a Protein and alfa is less than or equal to 0.94, return the answer with the help of the Poisson model
 		| otherwise = 3.7 --Otherwise return 3.7
 
+-- Profile
+data Profile = Profile [[Double]] Bool Int String -- M, DNA eller inte, Hur många sekvenser den är byggd av, Namnet på profilen
+
+--molseqs2profile :: String -> [MolSeq] -> Profile
+--molseqs2profile n ma = Profile [[//TODO]] isDNA(ma !! 0) (length ma) n 
 distanceMatrix a = []
 profileFrequency a = []
 profileDistTest a = []
 profileDistance a = []
-molseqs2profile a = []
 
