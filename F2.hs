@@ -44,11 +44,14 @@ formulaCheck b alfa
 
 -- Profile
 data Profile = Profile [[(Char, Int)]] Bool Int String -- M, DNA eller inte, Hur många sekvenser den är byggd av, Namnet på profilen
-proName :: Profile -> String
-proName (Profile _ _ _ s) = s
+profileName :: Profile -> String
+profileName (Profile _ _ _ s) = s
 
 proMat :: Profile -> [[(Char, Int)]]
 proMat (Profile m _ _ _) = m
+
+profileFrequency :: Profile -> Int -> Char -> Double
+
 
 molseqs2profile :: String -> [MolSeq] -> Profile
 molseqs2profile n ma = (Profile (makeProfileMatrix ma) (isDNA(ma !! 0)) (length ma) n)
