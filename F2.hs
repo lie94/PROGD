@@ -50,7 +50,15 @@ profileName (Profile _ _ _ s) = s
 proMat :: Profile -> [[(Char, Int)]]
 proMat (Profile m _ _ _) = m
 
+proLen :: Profile -> Int
+proLen (Profile _ _ r _) = r
+
 profileFrequency :: Profile -> Int -> Char -> Double
+profileFrequency p i c = fromIntegral((search((proMat p) !! i) c))/(fromIntegral(proLen p))
+	where
+		search (h:t) c = if not(fst(h) == c) then search t c 
+						else snd h
+		search [] _ = 0
 
 
 molseqs2profile :: String -> [MolSeq] -> Profile
@@ -77,7 +85,6 @@ makeProfileMatrix s1 = res
 	res = map sort (map ( \l -> unionBy equalFst l defaults) tmp1)
 -- SLUT PÅ KODSKELLET
 distanceMatrix a = []
-profileFrequency a = []
 profileDistTest a = []
 profileDistance a = []
 
