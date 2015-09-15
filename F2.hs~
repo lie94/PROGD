@@ -1,5 +1,6 @@
 -- Av Felix Hedenström och Jonathan Rinnarv
 module F2 where
+import Data.List
 data MolSeq = MolSeq String String Bool -- If it's DNA, the bool should be True
 string2seq :: String -> String -> MolSeq
 string2seq n s = if isACGT(s) then MolSeq n s True
@@ -20,6 +21,7 @@ seqSequence (MolSeq _ s _) = s
 -- Checks if a MolSeq is of type DNA
 isDNA :: MolSeq -> Bool
 isDNA (MolSeq _ _ b) = b
+
 seqLength :: MolSeq -> Int
 seqLength (MolSeq _ s _) = length s 
 
@@ -41,10 +43,36 @@ formulaCheck b alfa
 		| otherwise = 3.7 --Otherwise return 3.7
 
 -- Profile
-data Profile = Profile [[Double]] Bool Int String -- M, DNA eller inte, Hur många sekvenser den är byggd av, Namnet på profilen
+data Profile = Profile [[(Char, Int)]] Bool Int String -- M, DNA eller inte, Hur många sekvenser den är byggd av, Namnet på profilen
+proName :: Profile -> String
+proName (Profile _ _ _ s) = s
+
+proMat :: Profile -> [[(Char, Int)]]
+proMat (Profile m _ _ _) = m
 
 molseqs2profile :: String -> [MolSeq] -> Profile
-molseqs2profile n ma = Profile [[//TODO]] isDNA(ma !! 0) (length ma) n 
+molseqs2profile n ma = (Profile (makeProfileMatrix ma) (isDNA(ma !! 0)) (length ma) n)
+
+-- KODSKELLET
+nucleotides = "ACGT"
+aminoacids = sort "ARNDCEQGHILKMFPSTWYVX"
+
+makeProfileMatrix :: [MolSeq] -> [[(Char, Int)]]
+makeProfileMatrix [] = error "Empty_sequence_list"
+makeProfileMatrix s1 = res
+	where
+	t = isDNA(head s1)
+	defaults = 
+		if t then
+			zip nucleotides (replicate (length nucleotides) 0)  -- Rad (i)
+		else
+			zip aminoacids (replicate (length aminoacids) 0)    -- Rad (ii)
+	strs = map seqSequence s1 
+	tmp1 = map ( map ( \x -> ((head x), (length x))) . group . sort) (transpose strs)
+	-- map f(g(x)) m
+	equalFst a b = (fst a) == (fst b)
+	res = map sort (map ( \l -> unionBy equalFst l defaults) tmp1)
+-- SLUT PÅ KODSKELLET
 distanceMatrix a = []
 profileFrequency a = []
 profileDistTest a = []
