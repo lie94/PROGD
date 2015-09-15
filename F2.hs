@@ -1,10 +1,18 @@
 -- Av Felix Hedenström och Jonathan Rinnarv
 module F2 where
 import Data.List
-data MolSeq = MolSeq String String Bool -- If it's DNA, the bool should be True
+data Evol = MolSeq | Profile
+distance :: Evol -> Evol -> Double
+distance (s0 :: MolSeq) (s1 :: MolSeq)  = seqDistance s0 s1 
+--distance p0 :: Profile (p1 :: Profile) = profileDistance p0 p1
+
+-- Profileconst
+data Profile = Profileconst [[(Char, Int)]] Bool Int String   -- M, DNA eller inte, Hur många sekvenser den är byggd av, Namnet på Profileconstn
+
+data MolSeq = Molseqconst String String Bool -- If it's DNA, the bool should be True
 string2seq :: String -> String -> MolSeq
-string2seq n s = if isACGT(s) then MolSeq n s True
-		else MolSeq n s False
+string2seq n s = if isACGT(s) then (Molseqconst n s True)
+		else (Molseqconst n s False)
 
 -- Check if string only contains ACGT
 isACGT :: String -> Bool
@@ -13,20 +21,23 @@ isACGT (a:s) = if (elem a "ACGT") then isACGT(s)
 		else False  
 
 seqName :: MolSeq -> String
-seqName (MolSeq n _ _) = n
+seqName (Molseqconst n _ _) = n
 
 seqSequence :: MolSeq -> String
-seqSequence (MolSeq _ s _) = s 
+seqSequence (Molseqconst _ s _) = s 
 
--- Checks if a MolSeq is of type DNA
+-- Checks if a Molseqconst is of type DNA
 isDNA :: MolSeq -> Bool
-isDNA (MolSeq _ _ b) = b
+isDNA (Molseqconst _ _ b) = b
+
+isDNAP :: Profile -> Bool -- isDNA for Profileconsts
+isDNAP (Profileconst _ b _ _) = b
 
 seqLength :: MolSeq -> Int
-seqLength (MolSeq _ s _) = length s 
+seqLength (Molseqconst _ s _) = length s 
 
 seqDistance :: MolSeq -> MolSeq -> Double
-seqDistance (MolSeq _ s0 b0) (MolSeq _ s1 b1) = if not (b0 == b1) then error "The MolSeq:s was not of the same types"
+seqDistance (Molseqconst _ s0 b0) (Molseqconst _ s1 b1) = if not (b0 == b1) then error "The Molseqconst:s was not of the same types"
 		else formulaCheck b0 ((seqDistanceHelp s0 s1 0 ) / fromIntegral(length s0))
 
 seqDistanceHelp :: String -> String -> Double -> Double
@@ -42,16 +53,15 @@ formulaCheck b alfa
 		| alfa <= 0.94 = (-19 / 20) * log(1 - 20 * alfa / 19) -- If it's a Protein and alfa is less than or equal to 0.94, return the answer with the help of the Poisson model
 		| otherwise = 3.7 --Otherwise return 3.7
 
--- Profile
-data Profile = Profile [[(Char, Int)]] Bool Int String -- M, DNA eller inte, Hur många sekvenser den är byggd av, Namnet på profilen
+
 profileName :: Profile -> String
-profileName (Profile _ _ _ s) = s
+profileName (Profileconst _ _ _ s) = s
 
 proMat :: Profile -> [[(Char, Int)]]
-proMat (Profile m _ _ _) = m
+proMat (Profileconst m _ _ _) = m
 
 proLen :: Profile -> Int
-proLen (Profile _ _ r _) = r
+proLen (Profileconst _ _ r _) = r
 
 profileFrequency :: Profile -> Int -> Char -> Double
 profileFrequency p i c = fromIntegral((search((proMat p) !! i) c))/(fromIntegral(proLen p))
@@ -61,8 +71,8 @@ profileFrequency p i c = fromIntegral((search((proMat p) !! i) c))/(fromIntegral
 		search [] _ = 0
 
 
-molseqs2profile :: String -> [MolSeq] -> Profile
-molseqs2profile n ma = (Profile (makeProfileMatrix ma) (isDNA(ma !! 0)) (length ma) n)
+molseq2profile :: String -> [MolSeq] -> Profile
+molseq2profile n ma = (Profileconst (makeProfileMatrix ma) (isDNA(ma !! 0)) (length ma) n)
 
 -- KODSKELLET
 nucleotides = "ACGT"
@@ -84,7 +94,12 @@ makeProfileMatrix s1 = res
 	equalFst a b = (fst a) == (fst b)
 	res = map sort (map ( \l -> unionBy equalFst l defaults) tmp1)
 -- SLUT PÅ KODSKELLET
-distanceMatrix a = []
-profileDistTest a = []
-profileDistance a = []
+profileDistance :: Profile -> Profile -> Double
+profileDistance p0 p1 = res
+						where
+						carr = 	if isDNAP(p0) then nucleotides --Räknar med att p0 och p1 är av samma typ
+								else aminoacids
+						res = sum [sum[ abs ( (profileFrequency p0 j (carr !! i)) - (profileFrequency p1 j (carr !! i)))| j <- [0..(length (proMat p0) - 1)]     ] | i <- [0..(length carr - 1)]]
 
+
+distanceMatrix a = []
