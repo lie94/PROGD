@@ -53,11 +53,14 @@ proMat (Profile m _ _ _) = m
 proLen :: Profile -> Int
 proLen (Profile _ _ r _) = r
 
+--profileDistance :: Profile -> Profile -> Double
+
 profileFrequency :: Profile -> Int -> Char -> Double
 profileFrequency p i c = fromIntegral((search((proMat p) !! i) c))/(fromIntegral(proLen p))
 	where
-		search (h:t) c = if not(fst(h) == c) then search t c 
-						else snd h
+		search (h:t) c
+			|	fst(h) == c = snd(h)
+			|	otherwise = search t c
 		search [] _ = 0
 
 
