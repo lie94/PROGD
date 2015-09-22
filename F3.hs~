@@ -7,7 +7,7 @@ class Evol a where	-- Evol är en typklass ´
 	distance :: a -> a -> Double
 	name :: a -> String
 	isDNA :: a -> Bool
-	--nj :: [a] -> [(String,String,Double)] -> Tree 
+	nj :: [a] -> [(String,String,Double)] -> Tree 
 	--nj evolM distM = 
 	distanceMatrix :: [a] -> [(String,String,Double)]
 	distanceMatrix l = [ ((name (l !! i)) ,(name (l !! j)),(distance (l !! i) (l !! j))	) | i <- [0..(length l - 1)]   , j <- [i..(length l - 1)]  ]--, i <= j]
