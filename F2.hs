@@ -27,6 +27,7 @@ instance Evol Profile where	--Om Evol är ProfleBool
 data Profile = Profileconst [[(Char, Int)]] Bool Int String   -- M, DNA eller inte, Hur många sekvenser den är byggd av, Namnet på Profileconstn
 
 data MolSeq = Molseqconst String String Bool -- If it's DNA, the bool should be True
+
 string2seq :: String -> String -> MolSeq
 string2seq n s = if isACGT(s) then (Molseqconst n s True)
 		else (Molseqconst n s False)
@@ -110,6 +111,9 @@ makeProfileMatrix s1 = res
 			zip aminoacids (replicate (length aminoacids) 0)    -- Rad (ii)
 	strs = map seqSequence s1 
 	tmp1 = map ( map ( \x -> ((head x), (length x))) . group . sort) (transpose strs) -- Använder en lambda funktion till att göra doublets med en bokstav och hur många instanser av bokstaven som finns 
+		-- ACGT   
+		-- CCGT
+		-- CTGT
 	-- map f(g(x)) m
 	equalFst a b = (fst a) == (fst b) -- Hjälpfunktion
 	res = map sort (map ( \l -> unionBy equalFst l defaults) tmp1)
@@ -120,3 +124,12 @@ profileDistance p0 p1 = res
 						carr = 	if isDNAP(p0) then nucleotides --Räknar med att p0 och p1 är av samma typ
 								else aminoacids
 						res = sum [sum[ abs ( (profileFrequency p0 j (carr !! i)) - (profileFrequency p1 j (carr !! i)))| j <- [0..(length (proMat p0) - 1)]     ] | i <- [0..(length carr - 1)]]
+
+
+
+
+
+
+
+
+
