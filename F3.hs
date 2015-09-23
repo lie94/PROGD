@@ -1,14 +1,18 @@
 -- Av Felix Hedenström och Jonathan Rinnarv
-module F2 where
+module F3 where
 import Data.List
+import System.Environment
 --data Evol = MolSeq | Profile
 --distance :: Evol -> Evol -> Double
 class Evol a where	-- Evol är en typklass ´
 	distance :: a -> a -> Double
 	name :: a -> String
 	isDNA :: a -> Bool
+	--nj :: [a] -> [(String,String,Double)] -> Tree 
+	--nj evolM distM = 
 	distanceMatrix :: [a] -> [(String,String,Double)]
 	distanceMatrix l = [ ((name (l !! i)) ,(name (l !! j)),(distance (l !! i) (l !! j))	) | i <- [0..(length l - 1)]   , j <- [i..(length l - 1)]  ]--, i <= j]
+	
 
 instance Evol MolSeq where --Om Evol är MolSeq
 	distance = seqDistance
@@ -19,9 +23,6 @@ instance Evol Profile where	--Om Evol är ProfleBool
 	distance = profileDistance
 	name = profileName
 	isDNA = isDNAP
-
---distance (s0 :: MolSeq) (s1 :: MolSeq)  = seqDistance s0 s1 
---distance p0 :: Profile (p1 :: Profile) = profileDistance p0 p1
 
 -- Profileconst
 data Profile = Profileconst [[(Char, Int)]] Bool Int String   -- M, DNA eller inte, Hur många sekvenser den är byggd av, Namnet på Profileconstn
@@ -124,3 +125,48 @@ profileDistance p0 p1 = res
 						carr = 	if isDNAP(p0) then nucleotides --Räknar med att p0 och p1 är av samma typ
 								else aminoacids
 						res = sum [sum[ abs ( (profileFrequency p0 j (carr !! i)) - (profileFrequency p1 j (carr !! i)))| j <- [0..(length (proMat p0) - 1)]     ] | i <- [0..(length carr - 1)]]
+
+
+--------------------------------------------------------------------------------
+-- F3
+
+data Tree = Branch MolSeq [Tree] | Leaf MolSeq
+{-
+-- leaves : Leaves
+nj :: [Profile] -> [(String,String,Double)] -> Tree
+nj leaves distansM = 	if length leaves > 3 then res
+			where
+		
+
+findLowest :: 		Profile
+findLowest a b leaves p lowestA lowestB =-}
+
+si :: MolSeq -> MolSeq -> [MolSeq] -> [(String,String,Double)] -> Double 
+si a b leaves distanceMatrix = res
+		where
+		get3th (_,_,a) = a
+		checkpair (t1,t2,t3) a b = (t1 == name a && t2 == name b) || (t1 == name b && t2 == name a)   
+		getDist a b = get3th([ t   | t <- distanceMatrix, (checkpair t a b) ] !! 0)		
+		x = fromIntegral((length leaves) - 2) * (getDist a b) 
+		sumF = sum [ getDist a z + getDist b z | z <- leaves]
+		res = x - sumF
+
+
+{-}
+main s = do
+	if null s
+		then return ()
+		else do
+			putStrLn $ makeTree s
+-}
+
+
+main = interact makeTree
+
+makeTree :: String -> String
+makeTree s = res
+	where
+		l = words s
+		lM = [string2seq (l !! (x - 1)) (l !! x ) | x <- [1,3..(length l - 1) ]]
+		dM = distance lM
+		res = name (lM !! 1)++['\n']

@@ -7,8 +7,11 @@ class Evol a where	-- Evol är en typklass ´
 	distance :: a -> a -> Double
 	name :: a -> String
 	isDNA :: a -> Bool
+	nj :: [a] -> [(String,String,Double)] -> Tree 
+	--nj evolM distM = 
 	distanceMatrix :: [a] -> [(String,String,Double)]
 	distanceMatrix l = [ ((name (l !! i)) ,(name (l !! j)),(distance (l !! i) (l !! j))	) | i <- [0..(length l - 1)]   , j <- [i..(length l - 1)]  ]--, i <= j]
+	
 
 instance Evol MolSeq where --Om Evol är MolSeq
 	distance = seqDistance
@@ -124,3 +127,37 @@ profileDistance p0 p1 = res
 						carr = 	if isDNAP(p0) then nucleotides --Räknar med att p0 och p1 är av samma typ
 								else aminoacids
 						res = sum [sum[ abs ( (profileFrequency p0 j (carr !! i)) - (profileFrequency p1 j (carr !! i)))| j <- [0..(length (proMat p0) - 1)]     ] | i <- [0..(length carr - 1)]]
+
+
+--------------------------------------------------------------------------------
+-- F3
+
+data Tree = Branch Profile [Tree] | Leaf Profile
+{-
+-- leaves : Leaves
+nj :: [Profile] -> [(String,String,Double)] -> Tree
+nj leaves distansM = 	if length leaves > 3 then res
+			where
+		
+
+findLowest :: 		Profile
+findLowest a b leaves p lowestA lowestB =-}
+
+-- n
+si :: Profile -> Profile -> [Profile] -> [(String,String,Double)] -> Double 
+si a b leaves distanceMatrix = res
+		where
+		get3th (_,_,a) = a
+		checkpair (t1,t2,t3) a b = (t1 == name a && t2 == name b) || (t1 == name b && t2 == name a)   
+		getDist a b = get3th([ t   | t <- distanceMatrix, (checkpair t a b) ] !! 0)		
+		x = fromIntegral((length leaves) - 2) * (getDist a b) 
+		sumF = sum [ getDist a z + getDist b z | z <- leaves]
+		res = x - sumF
+
+
+
+
+
+
+
+
