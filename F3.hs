@@ -1,6 +1,7 @@
 -- Av Felix Hedenström och Jonathan Rinnarv
-module F2 where
+module F3 where
 import Data.List
+import System.Environment
 --data Evol = MolSeq | Profile
 --distance :: Evol -> Evol -> Double
 class Evol a where	-- Evol är en typklass ´
@@ -22,9 +23,6 @@ instance Evol Profile where	--Om Evol är ProfleBool
 	distance = profileDistance
 	name = profileName
 	isDNA = isDNAP
-
---distance (s0 :: MolSeq) (s1 :: MolSeq)  = seqDistance s0 s1 
---distance p0 :: Profile (p1 :: Profile) = profileDistance p0 p1
 
 -- Profileconst
 data Profile = Profileconst [[(Char, Int)]] Bool Int String   -- M, DNA eller inte, Hur många sekvenser den är byggd av, Namnet på Profileconstn
@@ -132,7 +130,7 @@ profileDistance p0 p1 = res
 --------------------------------------------------------------------------------
 -- F3
 
-data Tree = Branch Profile [Tree] | Leaf Profile
+data Tree = Branch MolSeq [Tree] | Leaf MolSeq
 {-
 -- leaves : Leaves
 nj :: [Profile] -> [(String,String,Double)] -> Tree
@@ -143,8 +141,7 @@ nj leaves distansM = 	if length leaves > 3 then res
 findLowest :: 		Profile
 findLowest a b leaves p lowestA lowestB =-}
 
--- n
-si :: Profile -> Profile -> [Profile] -> [(String,String,Double)] -> Double 
+si :: MolSeq -> MolSeq -> [MolSeq] -> [(String,String,Double)] -> Double 
 si a b leaves distanceMatrix = res
 		where
 		get3th (_,_,a) = a
@@ -155,9 +152,21 @@ si a b leaves distanceMatrix = res
 		res = x - sumF
 
 
+{-}
+main s = do
+	if null s
+		then return ()
+		else do
+			putStrLn $ makeTree s
+-}
 
 
+main = interact makeTree
 
-
-
-
+makeTree :: String -> String
+makeTree s = res
+	where
+		l = words s
+		lM = [string2seq (l !! (x - 1)) (l !! x ) | x <- [1,3..(length l - 1) ]]
+		dM = distance lM
+		res = name (lM !! 1)++['\n']
