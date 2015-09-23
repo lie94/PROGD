@@ -148,16 +148,6 @@ si a b leaves dM = res
 		sumF = sum [ (getValue a z dM) + (getValue b z dM) | z <- leaves]
 		res = x - sumF
 
-
-{-}
-main s = do
-	if null s
-		then return ()
-		else do
-			putStrLn $ makeTree s
--}
-
-
 main = interact makeTree
 
 getValue :: MolSeq -> MolSeq -> [(String,String,Double)] -> Double
