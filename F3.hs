@@ -1,5 +1,5 @@
 -- Av Felix Hedenström och Jonathan Rinnarv
-module F3 where
+module Main where
 import Data.List
 import System.Environment
 --data Evol = MolSeq | Profile
