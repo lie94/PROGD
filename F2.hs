@@ -26,7 +26,9 @@ instance Evol Profile where	--Om Evol är ProfleBool
 -- Profileconst
 data Profile = Profileconst [[(Char, Int)]] Bool Int String   -- M, DNA eller inte, Hur många sekvenser den är byggd av, Namnet på Profileconstn
 
-data MolSeq = Molseqconst String String Bool -- If it's DNA, the bool should be True
+data MolSeq = Molseqconst {seqName :: String,
+							seqSequence :: String,
+							isDNAM :: Bool} -- If it's DNA, the bool should be True
 
 string2seq :: String -> String -> MolSeq
 string2seq n s = if isACGT(s) then (Molseqconst n s True)
@@ -38,15 +40,15 @@ isACGT [] = True -- Kanske bör ändras till isACGT (x:[]) = True
 isACGT (a:s) = if (elem a "ACGT") then isACGT(s)
 		else False  
 
-seqName :: MolSeq -> String
-seqName (Molseqconst n _ _) = n
+--seqName :: MolSeq -> String
+--seqName (Molseqconst n _ _) = n
 
-seqSequence :: MolSeq -> String
-seqSequence (Molseqconst _ s _) = s 
+--seqSequence :: MolSeq -> String
+--seqSequence (Molseqconst _ s _) = s 
 
 -- Checks if a Molseqconst is of type DNA
-isDNAM :: MolSeq -> Bool
-isDNAM (Molseqconst _ _ b) = b
+--isDNAM :: MolSeq -> Bool
+--isDNAM (Molseqconst _ _ b) = b
 
 isDNAP :: Profile -> Bool -- isDNA for Profileconsts
 isDNAP (Profileconst _ b _ _) = b
