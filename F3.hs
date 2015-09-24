@@ -6,23 +6,28 @@ import System.Environment
 
 main = interact makeTree
 
-si :: String -> String -> [String] -> [(String,String,Double)] -> Double 
-si a b leaves dM = res
-		where    		
-		x = fromIntegral((length leaves) - 2) * (getValue a b dM) 
-		sumF = sum [ (getValue a z dM) + (getValue b z dM) | z <- leaves]
-		res = x - sumF
+si :: Int -> Int -> Int -> [[Double]] -> Double 
+si a b length_leaves dM = 	res
+					where    		
+					x = fromIntegral( length_leaves - 2) * (getValue a b dM) 
+					sumF = sum [ (getValue a i dM) + (getValue b i dM) | i <- [0..(length_leaves - 1)]]
+					res = x - sumF
 
 
 --90 % av tiden går åt detta
 
-getValue :: String -> String -> [(String,String,Double)] -> Double
+getValue :: Int -> Int -> [[Double]] -> Double
+getValue a b m 
+				| (a < b && (a > length m || ((b - a) > length(m !! a))))  || (b < a && (b > length m || ((a - b) > length (m !! b)))) = error ("A or B is larger than the possible indexes: A:"++show(a)++", B:"++show(b))
+				| a < b 			= (m !! a) !! (b - a)
+				| otherwise 		= (m !! b) !! (a - b) 		
+{-getValue :: String -> String -> [(String,String,Double)] -> Double
 getValue a b [] = error ("Hittade inte ab: ("++(a)++", "++(b)++")") 
 getValue a b (h:ms)
-				| checkpair h a b = get3th h
-				| otherwise = getValue a b ms
+				| checkpair h a b = get3rd h
+				| otherwise = getValue a b ms-}
 
-get3th (_,_,a) = a
+get3rd (_,_,a) = a
 
 checkpair :: (String,String,d) -> String -> String -> Bool 
 checkpair (t1,t2,_) a b = ((a == t1) && (b == t2))  || ((b == t1) && (a == t2))
@@ -31,11 +36,14 @@ checkpair (t1,t2,_) a b = ((a == t1) && (b == t2))  || ((b == t1) && (a == t2))
 						| otherwise = False-}
 						
 
-getNewDistM :: String -> String -> String -> [String] -> [(String,String,Double)] -> [(String,String,Double)] 
+{-getNewDistM :: String -> String -> String -> [String] -> [(String,String,Double)] -> [(String,String,Double)] 
 getNewDistM tree a b l m = res 
 					where
 					containsName s (a,b,_) = a == s || b == s
-					res = [(tree, tree, 0)]++[if (containsName b t) then (tree,  (getNameTrip b t) , (getAvrage a b (getMolseq l (getNameTrip b t)) m)    ) else t  | t <- m , not(containsName a t) && not (getNameTrip b t == nullString)]
+					res = [(tree, tree, 0)]++[if (containsName b t) then (tree,  (getNameTrip b t) , (getAvrage a b (getMolseq l (getNameTrip b t)) m)    ) else t  | t <- m , not(containsName a t) && not (getNameTrip b t == nullString)]-}
+-- The new index for the tree will be the same as the old index for a
+getNewDistM :: Int -> Int -> [String] -> [[Double]] -> [[Double]]
+getNewDistM old_a old_b list old_matrix = old_matrix --[         [ (old_matrix !! i )!! j ]          | i <- [0..(length old_matrix - 1)], j <- [0..(length (old_matrix !! i) - 1)], not(i == old_b) ]
 
 getMolseq :: [String] -> String -> String
 getMolseq [] n = error ("Hittade inte någan molseq av typ: "++n)
@@ -43,11 +51,11 @@ getMolseq (h:xs) n = if h == n then h else getMolseq xs n
 
 getNameTrip :: String -> (String,String,Double) -> String
 getNameTrip b (f,s,_) 
-					| b == f && b == s 			= nullString
+					| b == f && b == s 			= ""
 					| b == s 					= f
 					| otherwise 				= s
 
-getAvrage :: String -> String -> String -> [(String,String,Double)] -> Double
+getAvrage :: Int -> Int -> Int -> [[Double]] -> Double
 getAvrage a b c m = (getValue a c m + getValue b c m) / 2
 
 makeTree :: String -> String
@@ -56,35 +64,37 @@ makeTree s = res
 		l = words s
 		lM = [string2seq (l !! (x - 1)) (l !! x ) | x <- [1,3..(length l - 1) ]]
 		nM = distanceMatrix lM
-		res = (helpTree (map name lM) nM)++['\n']
+		m = translateMatrix nM (length lM) (length lM) 0
+		res = (helpTree (map name lM) m)++['\n']
 
-helpTree :: [String] -> [(String,String,Double)] -> String
+translateMatrix :: [(String,String,Double)] -> Int -> Int -> Int -> [[Double]]
+translateMatrix m l ol start = if ol == 0 then [] else (([[ get3rd (m !! i) | i <- [start..l - 1]]]) ++ (translateMatrix m (ol+l-1) (ol-1) l))
+
+helpTree :: [String] -> [[Double]] -> String
 helpTree l m = 	if length l == 3 then "("++(l !! 0)++","++(l !! 1)++","++(l !! 2)++")"
 				else 	res
 						where
-						ab = findAB l m 0 l nullString nullString															--a)
-						t1 = intercalate "" ["(",(ab !! 0),",",(ab !! 1),")"]								 	--b)
-						l1 = getNewList (ab !! 0) (ab !! 1) t1 l 															--c)
-						m1 = getNewDistM t1 (ab !! 0) (ab !! 1) l1 m														--d)
-						res = helpTree l1 m1
+						ab = findAB 0 m 0 (length l) (-1) (-1)																--a)
+						--t1 = intercalate "" ["(",(l !! (ab !! 0)),",",(l !! (ab !! 1)),")"]								 	--b)
+						--l1 = getNewList (ab !! 0) (ab !! 1) t1 l 															--c)
+						--m1 = getNewDistM (ab !! 0) (ab !! 1) l1 m														--d)
+						res = "TESTBOYS"++(show (length ab))--helpTree l1 m1
 
 
-getNewList :: String -> String -> String -> [String] -> [String]						
-getNewList a b t l = [x | x <- l, not(x == a || x == b)]++[t]
-
-nullString :: String
-nullString = ""
+{-getNewList :: String -> String -> String -> [String] -> [String]						
+getNewList a b t l = [x | x <- l, not(x == a || x == b)]++[t]-}
+getNewList :: Int -> Int -> String -> [String] -> [String]
+getNewList a b ts l = [if (i == a) then ts else	l !! i | i <- [0..(length l - 1)], not(i == b)] 
 
 --data TreeID = TreeID {id :: Int, name ::String}
 
-findAB :: [String] -> [(String,String,Double)] -> Double -> [String] -> String -> String -> [String]
-findAB [] _ _ _ lA lB = [lA, lB]
-findAB (h:xs) m lowest leaves lA lB  = 	res
-										where
-										findB a [] leaf dm low lB = (lB,low)
-										findB a (lh:lt) leaf dm low lB = 	result
-																			where 
-																			k = si a lh leaf dm
-																			result = if k < low then findB a lt leaf dm k lh else findB a lt leaf dm low lB		
-										bl = findB h xs leaves m lowest nullString
-										res = if (fst(bl)) == nullString then findAB xs m lowest leaves lA lB else findAB xs m (snd(bl)) leaves h (fst(bl))
+findAB :: Int -> [[Double]] -> Double -> Int -> Int -> Int -> [Int]
+findAB index m lowest length_leaves lA lB  = 	if index >= (length_leaves - 1 ) then [lA,lB] else res
+												where
+												findB a indexb length_leaf dm low lB = if index >= (length_leaf - 1 ) then (lB,low) 
+																											else result
+																											where 
+																											k = si a indexb length_leaf dm
+																											result = if k < low then findB a (indexb + 1) length_leaf dm k index else findB a (indexb + 1) length_leaf dm low lB		
+												bl = findB index (index + 1) length_leaves m lowest (-1)
+												res = if (fst(bl)) == (-1) then findAB (index + 1) m lowest length_leaves lA lB else findAB (index + 1) m (snd(bl)) length_leaves index (fst(bl))
