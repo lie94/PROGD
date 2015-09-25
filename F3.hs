@@ -75,10 +75,10 @@ helpTree l m = 	if length l == 3 then "("++(l !! 0)++","++(l !! 1)++","++(l !! 2
 				else 	res
 						where
 						ab = findAB 0 m 0 (length l) (-1) (-1)																--a)
-						--t1 = intercalate "" ["(",(l !! (ab !! 0)),",",(l !! (ab !! 1)),")"]								 	--b)
-						--l1 = getNewList (ab !! 0) (ab !! 1) t1 l 															--c)
-						--m1 = getNewDistM (ab !! 0) (ab !! 1) l1 m														--d)
-						res = "TESTBOYS"++(show (length ab))--helpTree l1 m1
+						t1 = intercalate "" ["(",(l !! (ab !! 0)),",",(l !! (ab !! 1)),")"]								 	--b)
+						l1 = getNewList (ab !! 0) (ab !! 1) t1 l 															--c)
+						m1 = getNewDistM (ab !! 0) (ab !! 1) l1 m														--d)
+						res = {-"TESTBOYS: "++(show (ab !! 1))-}helpTree l1 m1
 
 
 {-getNewList :: String -> String -> String -> [String] -> [String]						
@@ -86,15 +86,12 @@ getNewList a b t l = [x | x <- l, not(x == a || x == b)]++[t]-}
 getNewList :: Int -> Int -> String -> [String] -> [String]
 getNewList a b ts l = [if (i == a) then ts else	l !! i | i <- [0..(length l - 1)], not(i == b)] 
 
---data TreeID = TreeID {id :: Int, name ::String}
-
-findAB :: Int -> [[Double]] -> Double -> Int -> Int -> Int -> [Int]
+findAB :: Int -> [[Double]] -> Double -> Int -> Int -> Int -> [Int]   
 findAB index m lowest length_leaves lA lB  = 	if index >= (length_leaves - 1 ) then [lA,lB] else res
 												where
-												findB a indexb length_leaf dm low lB = if index >= (length_leaf - 1 ) then (lB,low) 
-																											else result
-																											where 
-																											k = si a indexb length_leaf dm
-																											result = if k < low then findB a (indexb + 1) length_leaf dm k index else findB a (indexb + 1) length_leaf dm low lB		
+												findB a indexb length_leaf dm low bestB = 	if indexb > (length_leaf - 1 ) then (bestB,low) else result --Ändrat till indexb istället för index
+																						where 
+																						k = si a indexb length_leaf dm 							
+																						result = if k < low then findB a (indexb + 1) length_leaf dm k indexb else findB a (indexb + 1) length_leaf dm low bestB --Ändrat till indexb istället för index		
 												bl = findB index (index + 1) length_leaves m lowest (-1)
 												res = if (fst(bl)) == (-1) then findAB (index + 1) m lowest length_leaves lA lB else findAB (index + 1) m (snd(bl)) length_leaves index (fst(bl))
