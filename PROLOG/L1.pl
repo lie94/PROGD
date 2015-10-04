@@ -22,5 +22,8 @@ rovarsprak([H|T1],[H|T2]):-
 	rovarsprak(T1,T2).
 
 medellangd(Text, AvgLen) :- AvgLen = 1.0.
+
+
+
 skyffla(Lista, Skyfflad) :- Skyfflad = Lista.
 % Man kan inte ha en mainfunktion när man lämnar in på kattis då den inte fungerar i det fallet.
