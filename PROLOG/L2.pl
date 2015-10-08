@@ -4,9 +4,12 @@
 spider(X):-
 	findall(Y,person(Y),L),
 	person(X),
+	subspider(X,L).
+subspider(X,L):-
 	getConspirators(X,Conspirators),
 	append([X],Conspirators,BadGuys),
-	hasConnection(L,BadGuys).
+	hasConnection(L,BadGuys),
+	!.
 
 
 hasConnection([],_).
