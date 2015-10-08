@@ -10,6 +10,6 @@
 person(ada).
 person(beda).
 person(calle).
-knows(ada,beda).
+knows(ada,beda).		
 knows(ada,calle).
 knows(beda,calle).
