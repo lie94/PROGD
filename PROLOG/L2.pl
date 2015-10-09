@@ -1,71 +1,47 @@
-%Någon vars alla bekanta inte känner varandra.
-/*spider(X):-
-	findall(Z,person(Z),L). % Potential spiders */
+﻿%Author Felix Hedenström och Jonathan Rinnarv
 spider(X):-
 	findall(Y,person(Y),L),
 	person(X),
 	subspider(X,L).
 subspider(X,L):-
 	getConspirators(X,Conspirators),
-	append([X],Conspirators,BadGuys),
-	hasConnection(L,BadGuys),
+	%check(Conspirators),
+	hasConnection(L,Conspirators,X),
 	!.
 
+getConspirators(PotentialSpider,PotentialConspirators):-
+	findall(X,helpKnows(PotentialSpider,X),L1),
+	!,
+	subConspirators(L1,PotentialConspirators).
+subConspirators([H|Tail],[H|ReturnList]):-
+	findall(X,helpKnows(H,X),HFriends),
+	subtract(Tail,HFriends,Rest),
+	subConspirators(Rest,ReturnList).
+subConspirators([_|Tail],ReturnList):-
+	subConspirators(Tail, ReturnList).
+subConspirators([],[]).
 
-hasConnection([],_).
-hasConnection([H|Tail],BadGuys):-
+hasConnection([],_,_):- !.
+hasConnection([H|Tail],BadGuys,Spider):-
 	not(member(H,BadGuys)),
+	not(Spider = H),
 	!,
 	friends(BadGuys,H),
-	hasConnection(Tail,BadGuys).
+	hasConnection(Tail,BadGuys,Spider).
 
-hasConnection([_|Tail],BadGuys):-
+hasConnection([_|Tail],BadGuys,Spider):-
 	!,
-	hasConnection(Tail,BadGuys).
-
-getConspirators(PotentialSpider, PotentialConspirators):-
-	findall(X,helpKnows(PotentialSpider,X),L1),
-	subConspirators(L1,Z),
-	without(L1,Z,L2),
-	!,
-	dual(Z,L2,PotentialConspirators).
-
-
-
-dual(L2,[],L2):- !.
-dual([],L1,L1):- !.
-dual(L2,_,L2).
-dual(_,L1,L1).
-
-subConspirators([],[]):- !.
-
-subConspirators([H|Tail],[H|ReturnList]):-
-	not(friends(Tail, H)),
-	!,
-	subConspirators(Tail, ReturnList).
-
-subConspirators([_|Tail],ReturnList):- % Vi behöver spara de som inte är friends och undersöka dem.
-	!,
-	subConspirators(Tail,ReturnList).
+	hasConnection(Tail,BadGuys,Spider).
 
 friends([],_):- false.
 friends([H|_],Atom):-
-	helpKnows(H,Atom).
+	helpKnows(H,Atom),
+	!.
 friends([_|Tail],Atom):-
 	friends(Tail,Atom).
 
-without([H|Tail1],List,[H|Tail2]):- 
-	not(member(H,List)), 
-	!,	
-	without(Tail1,List,Tail2).
-without([_|Tail1],List,NewList):-
-	without(Tail1,List,NewList).
-without([],_,[]):- !.
-
-
 helpKnows(X,Y):-
-	knows(X,Y);knows(Y,X),
-	not(X = Y).
+	knows(X,Y);knows(Y,X).
 
 % Hitta spindlar!
 % Ta alla som s känner. A_1 = [a_1...a_n]
@@ -76,12 +52,6 @@ helpKnows(X,Y):-
 % Ta första elementet i A_2, a_1 och ta bort alla element ur A_2 så att a_1 känner det elementet.
 % När detta är gjort har du kvar en lista med potentiella konspiratörer
 % Gör en lista av de element som du tagit bort, gör samma sak med dem, då de också är potentiella konspiratörer.
-
-
-
-
-
-
 
 % Kolla om alla andra element i listan över totala antalet personer känner någon av de potentiella konspiratörerna eller spinden själv.
 % Om de gör det har du hittat en potentiell spindel.
