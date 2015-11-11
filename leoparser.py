@@ -5,6 +5,11 @@ import re
 
 def main():
 	lineNr = 1
+	test = stdin.read()
+	test = re.sub("\n",'', test)
+	test = repr(test)
+	print test
+
 	for line in stdin:
 		print lineNr
 		n = correctSyntax(line)
