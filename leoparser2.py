@@ -1,4 +1,5 @@
 #Author: Felix Hedenstrom och Jonathan Rinnarv
+# -*- coding: utf-8 -*-
 
 
 #<Uttryck> 	::= REP <Faktor> "<Uttryck>". | <Term> | REP <Faktor> <Term>
@@ -32,7 +33,11 @@ def main():
 	base_string = base_string.upper()
 	splitpunctuation_string = re.sub("(\%.*)?\n",' ', base_string).split(".")
 	#print(splitpunctuation_string)
+	if not(re.search(EMPTY+"|(^\"+)",splitpunctuation_string[-1])):
+		printError(len(splitpunctuation_string)-1)
+		return
 	syntaxtree = recursiveCheck(splitpunctuation_string,[],1)
+	#print (syntaxtree)
 	if not(isinstance(syntaxtree[0],list)):
 		printError(syntaxtree[0])
 		return
@@ -155,19 +160,30 @@ def recursiveCheck(split_string, syntaxtree, counter):
 			syntaxtree.append(getCode(split_string[counter-1]))
 		return recursiveCheck(split_string,syntaxtree,counter + 1)
 		
-	elif re.search("REP\s+\d+\s+\"", split_string[counter - 1]):
+	elif re.search("^\s*REP\s+\d+\s+\"", split_string[counter - 1]): #with \"
 		d = int(re.findall("\d+",split_string[counter - 1])[0])
 		split_string[counter - 1] = re.sub("^\s*(REP\s+\d+\s+\")",'',split_string[counter - 1])
 		loopEnd = getEndLoop(split_string, counter, 0)
 		if loopEnd == 0:
 			return [counter]
-		if re.search("\"\s*$",split_string[loopEnd - 1]):
+		split_string[loopEnd-1] = re.sub("\"",' ',split_string[loopEnd-1],1)
+		#print split_string
+		"""if re.search("\"\s*$",split_string[loopEnd - 1]):
 			split_string[loopEnd - 1] = re.sub("\"\s*$",'',split_string[loopEnd - 1])
 		else:
-			split_string[loopEnd - 1] = re.sub("^\s*\"",'',split_string[loopEnd - 1])
+			split_string[loopEnd - 1] = re.sub("^\s*\"",'',split_string[loopEnd - 1])"""
 		
-		newList = split_string[counter-1:loopEnd-1] #Jonathan vet precis varför detta skall vara "-1"
+		#if något 
+		# SKA DET VARA -1
+		# ELSE 
+		# INTE MINUS 1
+		#if(re.search("\"",split_string[loopEnd - 1])):
+		newList = split_string[counter-1:loopEnd]
+		#else:
+		#	newList = split_string[counter-1:loopEnd-1] #Jonathan vet precis varför detta skall vara "-1"
+		#print (newList)
 		part_tree = recursiveCheck(newList, [], 1)
+		#print part_tree
 		if not(isinstance(part_tree[0],list)):
 			counter += part_tree[0] - 1
 		else:
@@ -175,7 +191,7 @@ def recursiveCheck(split_string, syntaxtree, counter):
 				syntaxtree += (part_tree)
 			return recursiveCheck(split_string,syntaxtree,loopEnd) #Felix vet precis varför det skall inte vara "+1"
 
-	elif re.search("REP\s+\d+\s+", split_string[counter - 1]):
+	elif re.search("^\s*REP\s+\d+\s+", split_string[counter - 1]): #Non \"
 		d = int(re.findall("\d+",split_string[counter - 1])[0])
 		split_string[counter - 1] = re.sub("^\s*(REP\s+\d+\s+)",'',split_string[counter - 1])
 		part_tree = recursiveCheck([split_string[counter - 1]], [], 1)
