@@ -112,4 +112,6 @@ def parse(l_input,syntaxtree,counter):
 def error(pre_lex, n):
 	print "Syntaxfel på rad " + str(n)
 	return
-main()
+main()def error(pre_lex, n):
+	print "Syntaxfel på rad " + str(n)
+	return

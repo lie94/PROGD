@@ -1,0 +1,7 @@
+% Nästlad loop 1
+REP 2 "UP. FORW 10. DOWN. REP 3 "LEFT 120. FORW 1.""
+FORW 10.
+% Nästlad loop 2
+%REP 3 "REP 2 "RIGHT 2. FORW 1."
+%       COLOR #FF0000. FORW 10. COLOR #0000FF."
+
