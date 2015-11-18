@@ -1,6 +1,6 @@
 FORW 1.
 BACK 1.
 DOWN.	
-UP           .
+UPS           .
 COLOR #133030.
 REP 2 " UP. "
