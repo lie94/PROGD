@@ -110,8 +110,51 @@ def parse(l_input,syntaxtree,counter):
 	return counter
 #TODO
 def error(pre_lex, n):
-	print "Syntaxfel på rad " + str(n)
+	lines = re.sub("(\%.*)",'', base_string).split("\n")
+	startline = findStartLine(lines, n)
+	for line in range(startline,len(lines)-1):
+		if line == startline:
+			if not(checkLine(lines[line - 1])) and not(checkLast(lines[line - 1])):
+				print "Syntaxfel på rad " + str(lineN)
+				return
+		elif not(re.search("^(\%.*)?\s*$", line)):
+			print "Syntaxfel på rad " + str(lineN)
+			return
+	print "Syntaxfel på rad " + str(startline)
 	return
-main()def error(pre_lex, n):
-	print "Syntaxfel på rad " + str(n)
-	return
+
+def checkLast(line):
+	statements = line.split(".")
+	s = statements[-1]
+	if re.search("^\s*$",s):
+		return True
+	if re.search("^(\s*(FORW|BACK|LEFT|RIGHT|COLOR)\s*)$", s):
+		return True
+	return False
+
+def checkLine(line):
+	DIRECTION = "^(\s*(FORW|BACK|LEFT|RIGHT)\s+\d+\s*)$"
+	UPDOWN = "^(\s*(DOWN|UP)\s*)$"
+	COLOR = "^(\s*COLOR\s+\#[0-9A-F]{6}\s*)$"
+	EMPTY = "^\s*$"
+	COMBINED = DIRECTION + "|" + UPDOWN + "|" + COLOR + "|" + EMPTY	
+	statements = line.split(".")
+	del statements[-1]
+	for statement in statements:
+		if not(re.search(COMBINED, statement)):
+			return False
+	return True
+
+def findStartLine(lines, n):
+	tokens = 0
+	lineN = 1
+	for line in lines:
+		templine = [i for i in re.split(r'(\s+|\.|\d+|\W+)', s_input) if i]
+		tokens += len(templine)
+		if tokens > n:
+			return lineN
+		lineN += 1
+	print ("Custom error findStartLine")
+	return -1
+
+main()
