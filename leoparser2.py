@@ -32,11 +32,16 @@ def main():
 	base_string = stdin.read()
 	base_string = base_string.upper()
 	splitpunctuation_string = re.sub("(\%.*)?\n",' ', base_string).split(".")
-	#print(splitpunctuation_string)
+	print("splitpunctuation_string: " + str(splitpunctuation_string))
 	if not(re.search(EMPTY+"|(^\"+)",splitpunctuation_string[-1])):
 		printError(len(splitpunctuation_string)-1)
 		return
-	syntaxtree = recursiveCheck(splitpunctuation_string,[],1)
+	try:
+		syntaxtree = recursiveCheck(splitpunctuation_string,[],1)
+	except RuntimeError, e:
+		print("Runtime Error")
+		raise
+
 	#print (syntaxtree)
 	if not(isinstance(syntaxtree[0],list)):
 		printError(syntaxtree[0])
@@ -168,20 +173,21 @@ def recursiveCheck(split_string, syntaxtree, counter):
 			return [counter]
 		split_string[loopEnd-1] = re.sub("\"",' ',split_string[loopEnd-1],1)
 		#print split_string
-		"""if re.search("\"\s*$",split_string[loopEnd - 1]):
-			split_string[loopEnd - 1] = re.sub("\"\s*$",'',split_string[loopEnd - 1])
-		else:
-			split_string[loopEnd - 1] = re.sub("^\s*\"",'',split_string[loopEnd - 1])"""
-		
-		#if något 
-		# SKA DET VARA -1
-		# ELSE 
-		# INTE MINUS 1
-		#if(re.search("\"",split_string[loopEnd - 1])):
 		newList = split_string[counter-1:loopEnd]
+		print "newList1: " + str(newList)
+		# TAR BORT ÖVERFLÖDIG INFORMATION EFTER "
+		if not(re.search("^\s*\"*\s$",newList[-1])):
+			newLast = []
+			for c in newList[-1]:
+				if re.search("[\s\"]",c):
+					newLast.append(c)
+				else:
+					break
+			newList[-1] = "".join(newLast)
+		print "newList2: " + str(newList)
+
 		#else:
 		#	newList = split_string[counter-1:loopEnd-1] #Jonathan vet precis varför detta skall vara "-1"
-		#print (newList)
 		part_tree = recursiveCheck(newList, [], 1)
 		#print part_tree
 		if not(isinstance(part_tree[0],list)):
@@ -201,6 +207,7 @@ def recursiveCheck(split_string, syntaxtree, counter):
 			for i in range(0,d):
 				syntaxtree += (part_tree)
 			return recursiveCheck(split_string,syntaxtree,counter + 1)
+
 
 	return [counter]
 
