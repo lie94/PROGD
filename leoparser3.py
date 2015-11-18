@@ -142,6 +142,7 @@ def parse(l_input,syntaxtree,counter,repCounter):
 				return parse(l_input, syntaxtree, counter + 5, repCounter)
 	return counter
 #TODO
+# ERRORET SER UT ATT VARA OFF BY ONE
 def error(pre_lex, n):
 	lines = re.sub("(\%.*)",'', pre_lex).split("\n")
 	startline = findStartLine(lines, n)
