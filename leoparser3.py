@@ -72,13 +72,61 @@ def main():
 	#print "main:pre_lex\t:" + str(pre_lex)
 	post_lex 	= lexer(pre_lex)
 	#print "main:post_lex\t: " + str(post_lex)
-	syntaxtree	= parse(post_lex,[],1,0,len(post_lex))
-	if not(isinstance(syntaxtree,list)):
-		print "error token: " + str(syntaxtree)
-		error(pre_lex,syntaxtree)
-		return
+	part1	= parsepart1(post_lex,[],1,0,len(post_lex))
+	#print "main:part1\t: " + str(part1)
+	if not(isinstance(part1,list)):
+		#print "error token\t: " + str(part1)
+		error(pre_lex,part1)
+	else:
+		syntaxtree = parsepart2(part1,[],0)
+		print "main:syntaxtree\t: " + str(syntaxtree)
+		printPath(syntaxtree)
 	#print "main:syntaxtree\t: " + str(syntaxtree)
-	printPath(syntaxtree)
+
+
+
+
+def parsepart2(inst_list, new_list, index):
+	if(index == len(inst_list)):
+		return new_list
+	#return inst_list
+	if(inst_list[index][0] == REPONE_N):
+		if index == len(inst_list) - 1:
+			return new_list
+		temp = [inst_list[index + 1],inst_list[index][1]]
+		new_list.append(temp)
+		return parsepart2(inst_list,new_list,  index + 2)
+	elif inst_list[index][0] == REP_N:
+		if index == len(inst_list) - 1:
+			return new_list
+		endrep = findEnd(inst_list, index + 1, 0)
+		#DETTA ÄR NOLLINDEXERAT
+		#print "parsepart2:endrep\t: " + str(endrep)
+		if not(endrep == index + 1):
+			subset = inst_list[(index + 1):endrep]
+			#print "parsepart2:subset\t:" + str(subset)
+			temp = parsepart2(subset,[],0)
+			temp.append(inst_list[index][1])
+			#temp.instert(0,inst_list[index][1])
+			new_list.append(temp)
+		return parsepart2(inst_list, new_list, endrep + 1)
+
+		#GÖR JOBBIGT SKIT
+	else:
+		new_list.append(inst_list[index])
+		return parsepart2(inst_list, new_list	,	index + 1)
+
+def findEnd(inst_list, index, leftRepCounter):
+	#print inst_list[index]
+	if inst_list[index][0] == QUOTE_N:
+		if leftRepCounter == 0:
+			return index
+		else:
+			leftRepCounter -= 1
+	elif inst_list[index][0] == REP_N:
+		leftRepCounter += 1
+	return findEnd(inst_list, index + 1, leftRepCounter)
+
 def lexer(s_input):
 	s_input = re.sub("\n", ' ' , re.sub("(\%.*)",' ', s_input))
 	#print "lexer:s_input: " + str(s_input)
@@ -100,7 +148,7 @@ def lexer(s_input):
 		if not(valid):
 			tokens.append(14)
 	return tokens
-def parse(l_input,syntaxtree,counter,repCounter,l_input_length):
+def parsepart1(l_input,syntaxtree,counter,repCounter,l_input_length):
 	if counter == l_input_length + 1:
 		if repCounter != 0:
 			counter -= 1
@@ -112,45 +160,44 @@ def parse(l_input,syntaxtree,counter,repCounter,l_input_length):
 		if l_input[counter] == WHITESPACE_N and isinstance(l_input[counter + 1],list) and isinstance(l_input[counter + 1][1],int):
 			if l_input[counter + 2] == WHITESPACE_N and counter + 3 < l_input_length and l_input[counter + 3] == PERIOD_N:  #Om det är space efter siffran följt av punkt
 				syntaxtree.append([l_input[counter - 1],l_input[counter + 1][1]])
-				return parse(l_input,syntaxtree,counter + 5, repCounter, l_input_length)
+				return parsepart1(l_input,syntaxtree,counter + 5, repCounter, l_input_length)
 			elif l_input[counter + 2] == PERIOD_N:																			#Om siffran är direct följt av punkt
 				syntaxtree.append([l_input[counter - 1],l_input[counter + 1][1]])
-				return parse(l_input,syntaxtree,counter + 4, repCounter, l_input_length)
+				return parsepart1(l_input,syntaxtree,counter + 4, repCounter, l_input_length)
 
 
 	elif l_input[counter - 1] in [UP_N, DOWN_N] and counter < l_input_length:												#DOWN UP
 		if l_input[counter] == WHITESPACE_N and counter + 1 < l_input_length and l_input[counter + 1] == PERIOD_N:			#Om det är space innan punkten
 			syntaxtree.append([l_input[counter - 1], 0]) # 0 Eftersom vi inte har någon styrsiffra som i de andra fallen
-			return parse(l_input,syntaxtree,counter + 3, repCounter, l_input_length)
+			return parsepart1(l_input,syntaxtree,counter + 3, repCounter, l_input_length)
 		elif l_input[counter] == PERIOD_N:																					#Om det inte är space innan punkten
 			syntaxtree.append([l_input[counter - 1], 0])
-			return parse(l_input,syntaxtree,counter + 2, repCounter, l_input_length)
+			return parsepart1(l_input,syntaxtree,counter + 2, repCounter, l_input_length)
 
 	elif l_input[counter - 1] == WHITESPACE_N:													#WHITESPACE
-		return parse(l_input,syntaxtree,counter + 1, repCounter, l_input_length)
+		return parsepart1(l_input,syntaxtree,counter + 1, repCounter, l_input_length)
 	
 
 	elif l_input[counter - 1] == REP_N and counter + 2 < l_input_length:						#REPSTART
 		if l_input[counter] == WHITESPACE_N and isinstance(l_input[counter + 1],list) and isinstance(l_input[counter + 1][1],int):
 			if counter + 3 < l_input_length and l_input[counter + 2] == WHITESPACE_N and l_input[counter + 3] == QUOTE_N:		#Om det är ett quote efter
-				print counter
+				#print counter
 				syntaxtree.append([l_input[counter - 1], l_input[counter + 1][1]])
-				return parse(l_input, syntaxtree, counter + 5, repCounter + 1, l_input_length)
-				#TODO
+				return parsepart1(l_input, syntaxtree, counter + 5, repCounter + 1, l_input_length)
 			elif l_input[counter + 2] == WHITESPACE_N:																												#Om det inte är ett quote efter
 				syntaxtree.append([REPONE_N,l_input[counter + 1][1]])
-				return parse(l_input, syntaxtree, counter + 3, repCounter, l_input_length) 
+				return parsepart1(l_input, syntaxtree, counter + 3, repCounter, l_input_length) 
 	elif l_input[counter - 1] == QUOTE_N and repCounter != 0:														#REPSLUT
 		syntaxtree.append([l_input[counter - 1], 0])
-		return parse(l_input, syntaxtree, counter + 1, repCounter - 1, l_input_length)
+		return parsepart1(l_input, syntaxtree, counter + 1, repCounter - 1, l_input_length)
 	elif counter + 2 < l_input_length and l_input[counter - 1] == COLOR_N:														#COLOR
 		if l_input[counter] == WHITESPACE_N and isinstance(l_input[counter + 1],list) and isinstance(l_input[counter + 1][1], basestring):
 			if l_input[counter + 2] == PERIOD_N:
 				syntaxtree.append([l_input[counter - 1], l_input[counter + 1][1]])
-				return parse(l_input, syntaxtree, counter + 4, repCounter, l_input_length)
+				return parsepart1(l_input, syntaxtree, counter + 4, repCounter, l_input_length)
 			elif counter + 3 < l_input_length and l_input[counter + 2] == WHITESPACE_N and l_input[counter + 3] == PERIOD_N:
 				syntaxtree.append([l_input[counter - 1], l_input[counter + 1][1]])
-				return parse(l_input, syntaxtree, counter + 5, repCounter, l_input_length)
+				return parsepart1(l_input, syntaxtree, counter + 5, repCounter, l_input_length)
 	return counter
 
 
@@ -198,12 +245,14 @@ def findStartLine(lines, n):
 	lineN = 1
 	for line in lines:
 		templine = [i for i in re.split(SPLITPATTERN, line) if i]
-		#print "templine: " + str(templine)
-		tokens += (len(templine) + 1)
+		#print "findStartLine:templine\t: " + str(templine)
+		
+		#print "findStartLine:len(templine)\t: " + str(len(templine))
+		tokens += (len(templine) + 1)  #KANSKE + 1
 		if tokens >= n:
 			return lineN
 		lineN += 1
-	print ("Custom error findStartLine")
+	#print ("Custom error findStartLine")
 	return -1
 def printPath(syntaxtree):
 	x = 0
@@ -211,12 +260,35 @@ def printPath(syntaxtree):
 	color = "#0000FF"
 	angle = 0
 	draw = False
-	moved = False
-	newX = 0
-	newY = 0
+	printPathinternal(syntaxtree,x,y,color,angle,draw)
 
+def printPathinternal(syntaxtree,in_x,in_y,in_color,in_angle,in_draw):
+	x = in_x
+	y = in_y
+	color = in_color
+	angle = in_angle
+	draw = in_draw
+	moved = False
+	newX = x
+	newY = y
+	#print "printPathinternal:syntaxtree\t: " + str(syntaxtree) + ", " + str(x)
 	for s in syntaxtree:
-		if s[0] == 1:
+		#print str(s) + ", " + str(x) + ", " + str(y)
+		if isinstance(s[0],list):
+			#print "TEST"
+			lengthofs = len(s)
+			data = [x , y , color, angle , draw]
+			for i in range(0,s[lengthofs - 1]):
+				#print "printPathinternal:s[0:(lengthofs - 1)]\t: "  + str(s[0:(lengthofs - 1)])
+				#printPathinternal(s[0:(lengthofs - 2)], x, y,color, angle, draw) #OFFBYONE
+				data = printPathinternal(s[0:(lengthofs - 1)], data[0], data[1],data[2], data[3], data[4])
+			x 		= data[0]
+			y 		= data[1]
+			color 	= data[2]
+			angle	= data[3]
+			draw	= data[4] 
+			
+		elif s[0] == 1:
 			newX = x+s[1]*math.cos(math.pi*angle/180)
 			newY = y+s[1]*math.sin(math.pi*angle/180)
 			moved = True
@@ -239,4 +311,5 @@ def printPath(syntaxtree):
 		x = newX
 		y = newY
 		moved = False
+	return [x , y , color, angle , draw]
 main()
