@@ -110,7 +110,7 @@ def parse(l_input,syntaxtree,counter):
 	return counter
 #TODO
 def error(pre_lex, n):
-	lines = re.sub("(\%.*)",'', base_string).split("\n")
+	lines = re.sub("(\%.*)",'', pre_lex).split("\n")
 	startline = findStartLine(lines, n)
 	for line in range(startline,len(lines)-1):
 		if line == startline:
@@ -149,7 +149,7 @@ def findStartLine(lines, n):
 	tokens = 0
 	lineN = 1
 	for line in lines:
-		templine = [i for i in re.split(r'(\s+|\.|\d+|\W+)', s_input) if i]
+		templine = [i for i in re.split(r'(\s+|\.|\d+|\W+)', line) if i]
 		tokens += len(templine)
 		if tokens > n:
 			return lineN
