@@ -71,7 +71,6 @@ def main():
 	pre_lex		= re.sub("\t",'',pre_lex)
 	#print "main:pre_lex\t:" + str(pre_lex)
 	post_lex 	= lexer(pre_lex)
-	#printDebug(post_lex)
 	#print "main:post_lex\t: " + str(post_lex)
 	part1	= parsepart1(post_lex,[],1,0,len(post_lex))
 	#print "main:part1\t: " + str(part1)
@@ -84,9 +83,7 @@ def main():
 		printPath(syntaxtree)
 	#print "main:syntaxtree\t: " + str(syntaxtree)
 
-def printDebug(post_lex):
-	for i in range(len(post_lex)):
-		print "printDebug:post_lex nr." + str(i + 1) + "\t: " + str(post_lex[i])
+
 
 
 def parsepart2(inst_list, new_list, index):
@@ -208,7 +205,6 @@ def parsepart1(l_input,syntaxtree,counter,repCounter,l_input_length):
 # ERRORET SER UT ATT VARA OFF BY ONE
 def error(pre_lex, n):
 	lines = re.sub("(\%.*)",'', pre_lex).split("\n")
-	#print "error:n\t: " + str(n)
 	startline = findStartLine(lines, n)
 	#print "error:startline\t: " + str(startline)
 	for line in range(startline,len(lines) + 1):
@@ -216,7 +212,6 @@ def error(pre_lex, n):
 			if not(checkLine(lines[line - 1])) or not(checkLast(lines[line - 1])):
 				print "Syntaxfel på rad " + str(line)
 				return
-		
 		elif re.search("^\s*(\"+\s*)+$", lines[line - 1]): #Har fuskat lite här
 			startline = line
 		elif not(re.search("^\s*(\"+\s*)*$", lines[line - 1])):
@@ -227,8 +222,7 @@ def error(pre_lex, n):
 def checkLast(line):
 	statements = line.split(".")
 	s = statements[-1]
-	#if re.search("^\s*(\"+\s*)*$",s):
-	if(re.search("^\s*$",s)):
+	if re.search("^\s*(\"+\s*)*$",s):
 		return True
 	if re.search("^(\s*(FORW|BACK|LEFT|RIGHT|COLOR)(\s+\d*)?\s*)$", s):
 		return True
@@ -253,19 +247,14 @@ def findStartLine(lines, n):
 	lineN = 1
 	for line in lines:
 		templine = [i for i in re.split(SPLITPATTERN, line) if i]
-		if len(templine) > 0 and not(re.search("^\s+$",templine[-1])):
-			templine.append(" ")
 		#print "findStartLine:templine\t: " + str(templine)
 		#print "findStartLine:len(templine)\t: " + str(len(templine))
-		tokens += (len(templine))  #KANSKE + 1
+		tokens += (len(templine) + 1)  #KANSKE + 1
 		if tokens >= n:
 			return lineN
 		lineN += 1
 	#print ("Custom error findStartLine")
 	return -1
-
-
-
 def printPath(syntaxtree):
 	x = 0
 	y = 0
