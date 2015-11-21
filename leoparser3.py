@@ -11,7 +11,8 @@
 
 
 
-from sys import stdin
+#from sys import stdin
+import sys
 import re
 import math
 
@@ -67,7 +68,8 @@ ALLOPTIONS 		= [FORW,BACK,LEFT,RIGHT,DOWN,UP,COLOR,REP,QUOTE,WHITESPACE,NUMBER,H
 #ANYVALID = WHITESPACE + "|" + NUMBER + "|" + HASHNUMBER + "|" + FORW + "|" + BACK + "|" + LEFT + "|" + RIGHT + "|" + DOWN + "|" + UP + "|" + COLOR + "|" + REPBEGIN + "|" + QUOTE + "|" + PERIOD
 
 def main():
-	pre_lex 	= stdin.read().upper()
+	sys.setrecursionlimit(9000)
+	pre_lex 	= sys.stdin.read().upper()
 	pre_lex		= re.sub("\t",'',pre_lex)
 	#print "main:pre_lex\t:" + str(pre_lex)
 	post_lex 	= lexer(pre_lex)
@@ -150,7 +152,10 @@ def lexer(s_input):
 				break
 		if not(valid):
 			tokens.append(14)
+	if tokens[0] == WHITESPACE_N:
+		del tokens[0]
 	return tokens
+
 def parsepart1(l_input,syntaxtree,counter,repCounter,l_input_length):
 	if counter == l_input_length + 1:
 		if repCounter != 0:
@@ -216,15 +221,14 @@ def error(pre_lex, n):
 			if not(checkLine(lines[line - 1])) or not(checkLast(lines[line - 1])):
 				print "Syntaxfel på rad " + str(line)
 				return
-		
-		elif re.search("^\s*(\"+\s*)+$", lines[line - 1]): #Har fuskat lite här
-			startline = line
-		elif not(re.search("^\s*(\"+\s*)*$", lines[line - 1])):
+		elif not(re.search("^\s*$", lines[line - 1])):
 			print "Syntaxfel på rad " + str(line)
 			return
 	print "Syntaxfel på rad " + str(startline)
 
 def checkLast(line):
+	if re.search("^\.\s*",line):
+		return False
 	statements = line.split(".")
 	s = statements[-1]
 	#if re.search("^\s*(\"+\s*)*$",s):
@@ -235,6 +239,8 @@ def checkLast(line):
 	return False
 
 def checkLine(line):
+	if re.search("\.\s*\.",line):
+		return False
 	DIRECTION = "^(\s*(FORW|BACK|LEFT|RIGHT)\s+\d+\s*)$"
 	UPDOWN = "^(\s*(DOWN|UP)\s*)$"
 	COLOR = "^(\s*COLOR\s+\#[0-9A-F]{6}\s*)$"
@@ -255,6 +261,10 @@ def findStartLine(lines, n):
 		templine = [i for i in re.split(SPLITPATTERN, line) if i]
 		if len(templine) > 0 and not(re.search("^\s+$",templine[-1])):
 			templine.append(" ")
+			#print templine
+		if len(templine) > 0 and re.search("^\s+$",templine[0]):
+			del templine[0]
+
 		#print "findStartLine:templine\t: " + str(templine)
 		#print "findStartLine:len(templine)\t: " + str(len(templine))
 		tokens += (len(templine))  #KANSKE + 1
