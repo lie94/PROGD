@@ -4,7 +4,7 @@
 
 
 #<Uttryck> 	::= REP <Faktor> "<Uttryck>". | <Term> | REP <Faktor> <Term>
-#<Term>		::=  <Styr> <Faktor> . | <StyrPenna>. | COLOR #<Faktor>. | .
+#<Term>		::=  <Styr> <Faktor> . | <StyrPenna>. | COLOR #<Faktor>.
 #<Styr> 	::= FORW | BACK | LEFT | RIGHT
 #<StyrPenna>::= DOWN | UP
 #<Faktor> 	::= TAL
@@ -83,6 +83,7 @@ def main():
 	else:
 		syntaxtree = parsepart2(part1,[],0)
 		#print "main:syntaxtree\t: " + str(syntaxtree)
+		#print len(syntaxtree)
 		printPath(syntaxtree)
 	#print "main:syntaxtree\t: " + str(syntaxtree)
 
@@ -114,6 +115,8 @@ def parsepart2(inst_list, new_list, index):
 			temp.append(inst_list[index][1])
 			#temp.instert(0,inst_list[index][1])
 			new_list.append(temp)
+		else:		#NOP
+			new_list.append([LEFT_N,0])
 		return parsepart2(inst_list, new_list, endrep + 1)
 
 		#GÖR JOBBIGT SKIT
@@ -291,6 +294,7 @@ def printPathinternal(syntaxtree,data):
 	#print "printPathinternal:syntaxtree\t: " + str(syntaxtree)
 	for s in syntaxtree:
 		#print str(s)
+		#print data
 		if isinstance(s[0],list):
 			for i in range(s[-1]):
 				data = printPathinternal(s[0:len(s)-1], data)
