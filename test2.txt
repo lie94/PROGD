@@ -1,5 +1,3 @@
 DOWN.
-REP 2 " 
-
-
-REP 3 "
+REP 4 REP 4 REP 4 " REP 3 FORW 1."
+%REP 4 REP 4 REP 4 FORW 1.
