@@ -4,15 +4,14 @@
 
 
 #<Uttryck> 	::= REP <Faktor> "<Uttryck>". | <Term> | REP <Faktor> <Term>
-#<Term>		::=  <Styr> <Faktor> . | <StyrPenna>. | COLOR #<Faktor>.
+#<Term>		::=  <Styr> <Faktor> . | <StyrPenna>. | COLOR #<Faktor>. | .
 #<Styr> 	::= FORW | BACK | LEFT | RIGHT
 #<StyrPenna>::= DOWN | UP
 #<Faktor> 	::= TAL
 
 
 
-#from sys import stdin
-import sys
+from sys import stdin
 import re
 import math
 
@@ -68,92 +67,26 @@ ALLOPTIONS 		= [FORW,BACK,LEFT,RIGHT,DOWN,UP,COLOR,REP,QUOTE,WHITESPACE,NUMBER,H
 #ANYVALID = WHITESPACE + "|" + NUMBER + "|" + HASHNUMBER + "|" + FORW + "|" + BACK + "|" + LEFT + "|" + RIGHT + "|" + DOWN + "|" + UP + "|" + COLOR + "|" + REPBEGIN + "|" + QUOTE + "|" + PERIOD
 
 def main():
-	sys.setrecursionlimit(100000)
-	pre_lex 	= sys.stdin.read().upper()
-	pre_lex		= re.sub("\t",' ',pre_lex)
+	pre_lex 	= stdin.read().upper()
+	pre_lex		= re.sub("\t",'',pre_lex)
 	#print "main:pre_lex\t:" + str(pre_lex)
-	
 	post_lex 	= lexer(pre_lex)
-
-	#printDebug(post_lex,"post_lex")
 	#print "main:post_lex\t: " + str(post_lex)
-	
 	part1	= parsepart1(post_lex,[],1,0,len(post_lex))
-	
 	#print "main:part1\t: " + str(part1)
 	if not(isinstance(part1,list)):
 		#print "error token\t: " + str(part1)
-		
 		error(pre_lex,part1)
-		
 	else:
-		
-		syntaxtree = parsepart22(part1,[],0)
-		
-		#printDebug(syntaxtree,"syntaxtree")
-		#syntaxtree = parsepart22(part1,[],0)
+		syntaxtree = parsepart2(part1,[],0)
 		#print "main:syntaxtree\t: " + str(syntaxtree)
-		#print len(syntaxtree)
-		#try:
 		printPath(syntaxtree)
-		#except TypeError:
-		#	raise NameError('HiThere')
 	#print "main:syntaxtree\t: " + str(syntaxtree)
 
-def printDebug(post_lex, name):
-	for i in range(len(post_lex)):
-		print "printDebug:" + name + " nr." + str(i + 1) + "\t: " + str(post_lex[i])
-
-def parsepart22(inst_list, new_list, index):
-	if(index == len(inst_list)):
-		return new_list
-	#return inst_list
-	if(inst_list[index][0] == REPONE_N):
-		#if index == len(inst_list) - 1:
-		#	return new_list
-		if inst_list[index + 1][0] == REPONE_N:
-			total_multiplier = inst_list[index][1] * inst_list[index + 1][1]
-			temp_index = index + 1
-			checkNext = True
-			while checkNext:
-				temp_index += 1
-				if inst_list[temp_index][0] == REPONE_N:
-					total_multiplier *= inst_list[temp_index][1]
-				elif inst_list[temp_index][0] == REP_N:
-					data_ = parsepart22(inst_list, [], temp_index + 1)
-					data_[1].append(inst_list[temp_index][1])
-					new_list.append([data_[1], total_multiplier])
-					return parsepart22(inst_list, new_list, data_[0] + 1)
-				else:
-					checkNext = False
-			new_list.append([inst_list[temp_index], total_multiplier])
-			return parsepart22(inst_list, new_list, temp_index + 1)
-		elif inst_list[index + 1][0] == REP_N:
-			data_ = parsepart22(inst_list, [], index + 2)
-			data_[1].append(inst_list[index + 1][1])
-			new_list.append([	data_[1], 	inst_list[index][1]	])
-			return parsepart22(inst_list, new_list, data_[0] + 1)
-		new_list.append([inst_list[index + 1],inst_list[index][1]])
-		return parsepart22(inst_list,new_list,  index + 2)
-	elif inst_list[index][0] == REP_N:
-		#if index == len(inst_list) - 1:
-		#	return new_list
-		#endrep = findEnd(inst_list, index + 1, 0)
-		#DETTA ÄR NOLLINDEXERAT
-		#print "parsepart2:endrep\t: " + str(endrep)
-		data_ = parsepart22(inst_list, [], index + 1)
-		data_[1].append(inst_list[index][1])
-		new_list.append(data_[1])
-		return parsepart22(inst_list, new_list, data_[0] + 1)
 
 
-	elif inst_list[index][0] == QUOTE_N:
-		return [index,new_list]
-	else:
-		new_list.append(inst_list[index])
-		return parsepart22(inst_list, new_list	,	index + 1)
 
-"""def parsepart2(inst_list, new_list, index):
+def parsepart2(inst_list, new_list, index):
 	if(index == len(inst_list)):
 		return new_list
 	#return inst_list
@@ -176,16 +109,14 @@ def parsepart22(inst_list, new_list, index):
 			temp.append(inst_list[index][1])
 			#temp.instert(0,inst_list[index][1])
 			new_list.append(temp)
-		else:		#NOP
-			new_list.append([LEFT_N,0])
 		return parsepart2(inst_list, new_list, endrep + 1)
 
 		#GÖR JOBBIGT SKIT
 	else:
 		new_list.append(inst_list[index])
-		return parsepart2(inst_list, new_list	,	index + 1)"""
+		return parsepart2(inst_list, new_list	,	index + 1)
 
-"""def findEnd(inst_list, index, leftRepCounter):
+def findEnd(inst_list, index, leftRepCounter):
 	#print inst_list[index]
 	if inst_list[index][0] == QUOTE_N:
 		if leftRepCounter == 0:
@@ -194,7 +125,7 @@ def parsepart22(inst_list, new_list, index):
 			leftRepCounter -= 1
 	elif inst_list[index][0] == REP_N:
 		leftRepCounter += 1
-	return findEnd(inst_list, index + 1, leftRepCounter)"""
+	return findEnd(inst_list, index + 1, leftRepCounter)
 
 def lexer(s_input):
 	s_input = re.sub("\n", ' ' , re.sub("(\%.*)",' ', s_input))
@@ -203,7 +134,6 @@ def lexer(s_input):
 	#print "lexer:temp\t:" + str(temp)
 	tokens = []
 	for token in temp:
-
 		valid = False
 		for i in range(0,13):
 			if re.search(ALLOPTIONS[i],token):
@@ -217,10 +147,7 @@ def lexer(s_input):
 				break
 		if not(valid):
 			tokens.append(14)
-	if tokens[0] == WHITESPACE_N:
-		del tokens[0]
 	return tokens
-
 def parsepart1(l_input,syntaxtree,counter,repCounter,l_input_length):
 	if counter == l_input_length + 1:
 		if repCounter != 0:
@@ -278,7 +205,6 @@ def parsepart1(l_input,syntaxtree,counter,repCounter,l_input_length):
 # ERRORET SER UT ATT VARA OFF BY ONE
 def error(pre_lex, n):
 	lines = re.sub("(\%.*)",'', pre_lex).split("\n")
-	#print "error:n\t: " + str(n)
 	startline = findStartLine(lines, n)
 	#print "error:startline\t: " + str(startline)
 	for line in range(startline,len(lines) + 1):
@@ -286,26 +212,23 @@ def error(pre_lex, n):
 			if not(checkLine(lines[line - 1])) or not(checkLast(lines[line - 1])):
 				print "Syntaxfel på rad " + str(line)
 				return
-		elif not(re.search("^\s*$", lines[line - 1])):
+		elif re.search("^\s*(\"+\s*)+$", lines[line - 1]): #Har fuskat lite här
+			startline = line
+		elif not(re.search("^\s*(\"+\s*)*$", lines[line - 1])):
 			print "Syntaxfel på rad " + str(line)
 			return
 	print "Syntaxfel på rad " + str(startline)
 
 def checkLast(line):
-	if re.search("^\.\s*",line):
-		return False
 	statements = line.split(".")
 	s = statements[-1]
-	#if re.search("^\s*(\"+\s*)*$",s):
-	if(re.search("^\s*$",s)):
+	if re.search("^\s*(\"+\s*)*$",s):
 		return True
 	if re.search("^(\s*(FORW|BACK|LEFT|RIGHT|COLOR)(\s+\d*)?\s*)$", s):
 		return True
 	return False
 
 def checkLine(line):
-	if re.search("\.\s*\.",line):
-		return False
 	DIRECTION = "^(\s*(FORW|BACK|LEFT|RIGHT)\s+\d+\s*)$"
 	UPDOWN = "^(\s*(DOWN|UP)\s*)$"
 	COLOR = "^(\s*COLOR\s+\#[0-9A-F]{6}\s*)$"
@@ -324,23 +247,14 @@ def findStartLine(lines, n):
 	lineN = 1
 	for line in lines:
 		templine = [i for i in re.split(SPLITPATTERN, line) if i]
-		if len(templine) > 0 and not(re.search("^\s+$",templine[-1])):
-			templine.append(" ")
-			#print templine
-		if len(templine) > 0 and re.search("^\s+$",templine[0]):
-			del templine[0]
-
 		#print "findStartLine:templine\t: " + str(templine)
 		#print "findStartLine:len(templine)\t: " + str(len(templine))
-		tokens += (len(templine))  #KANSKE + 1
+		tokens += (len(templine) + 1)  #KANSKE + 1
 		if tokens >= n:
 			return lineN
 		lineN += 1
 	#print ("Custom error findStartLine")
 	return -1
-
-
-
 def printPath(syntaxtree):
 	x = 0
 	y = 0
@@ -356,7 +270,6 @@ def printPathinternal(syntaxtree,data):
 	#print "printPathinternal:syntaxtree\t: " + str(syntaxtree)
 	for s in syntaxtree:
 		#print str(s)
-		#print data
 		if isinstance(s[0],list):
 			for i in range(s[-1]):
 				data = printPathinternal(s[0:len(s)-1], data)
@@ -381,7 +294,7 @@ def printPathinternal(syntaxtree,data):
 
 		if moved:
 			if data[4]:
-				print (str(data[2]) + " %.4f %.4f %.4f %.4f" % (data[0],data[1],newX,newY))
+				print (data[2] + " %.4f %.4f %.4f %.4f" % (data[0],data[1],newX,newY))
 			data[0] = newX
 			data[1] = newY
 		moved = False
