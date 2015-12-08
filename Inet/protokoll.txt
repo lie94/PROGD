@@ -1,0 +1,53 @@
+All data som skickas börjar med en instruktion. Den beskriver hur
+informationen som kommer efter ska tolkas. Man fortsätter tolka tills man
+kommer till en null message.
+
+
+char temp[10];
+temp[0] = 0 - (2^8 - 1)
+temp[1] = 2^16 - 1 
+
+Protokoll:
+Client ID 	Typ av instruktion   Utökning av protokoll	  Nr på instuktionen	
+| 00 00    | 00 00 				|00 00 00 00 00 		| 00 
+Information:
+
+
+
+Authentication:
+	Client Instruktion:
+		Läs två ints som följer. Första är kortnummret, andra är sifferkoden. 
+		0x00 00 00 00 - 01
+
+	Server Instructions:
+		Du är authenticated, ditt ID står i början
+		0xID 00 00 - 01
+		
+		Du är inte authenticated, försök igen
+		0x00 00 00 00 - 02
+
+!!Alla instruktioner förutom authentication kräver ett ID i början av instruktionen.!!
+
+Withdrawing:
+	Client Instructions:
+		Läs två ints, en sifferkod och en som berättar hur mycket som ska dras ut
+		0xID 01 - 01
+
+Deposit:
+	Client Instruction  
+
+Updatera strängar:
+	Server Instructions:
+	0x00 
+
+int temp = 1341515;
+char array[4];
+INSTUKTION //LÄS ALLA RADER SOM SAMMA INT, KONKATINERA DEM
+INT
+NULL
+INSTRUKTION	//LÄS ALLA RADER SOM VARSIN INT
+INT
+INT
+INT
+INT
+NULL
