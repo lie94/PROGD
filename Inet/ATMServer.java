@@ -2,7 +2,8 @@ import java.net.*;
 import java.io.*;
 
 /**
-*/
+ *  @author Viebrapadata
+ */
 public class ATMServer {
 
     private static int connectionPort = 8989;

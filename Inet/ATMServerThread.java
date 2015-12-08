@@ -2,10 +2,15 @@ import java.io.*;
 import java.net.*;
 
 /**
-*/
-public class ATMServerThread extends Thread{
+ *  @author Viebrapadata
+ */
+public class ATMServerThread extends Thread {
     private Socket socket = null;
     private BufferedReader in;
+    private String card_number = "";
+    private boolean validated = false;
+
+
     PrintWriter out;
     public ATMServerThread(Socket socket) {
         super("ATMServerThread");
@@ -18,77 +23,73 @@ public class ATMServerThread extends Thread{
         return str;
     }
 
-    private boolean validateUser() {
-        return true;
+    private boolean validateUser(String filename, int code) {
+        try {
+            FileReader fileReader = 
+                new FileReader(filename + ".txt");
+
+            BufferedReader bufferedReader = 
+                new BufferedReader(fileReader);
+            int file_code = Integer.parseInt(bufferedReader.readLine());
+            if(file_code * 2 - 1 == code){
+                String tempString = bufferedReader.readLine(); 
+                PrintWriter temp_out = new PrintWriter(filename + ".txt");
+                temp_out.println(file_code + 1);
+                temp_out.println(tempString);
+                temp_out.close();      
+                bufferedReader.close();         
+                return true;
+            }else{
+                bufferedReader.close();
+                return false;
+            }
+        } catch(Exception e) {
+            return false;
+        }
+    
     }
 
-    private void readFromFile(){
+    
 
-    }        
     public void run(){
+         
         try {
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader
                 (new InputStreamReader(socket.getInputStream()));
-			
+
             String inputLine, outputLine;
-            while(true){
-                inputLine = readLine();
-                switch(){
-                    
-                } 
-
-            }
-       	}catch (IOException e){
-        	e.printStackTrace();
-        }
-    }
-    /*public void run(){
-
-    	try{
-  			out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader
-                (new InputStreamReader(socket.getInputStream()));
-			
-            String inputLine, outputLine;
-
+	
             int balance = 1000;
             int value;
+            
+            while(!validated){
+                char temp [] = in.readLine().toCharArray();
+                if(ProtocolHandler.getInstructionType(temp) == ProtocolHandler.TYPE_AUTHENTICATION && ProtocolHandler.getInstructionNumber(temp) == 1 ){ //Following this is the card number and authentication code
+                    String card_number = in.readLine();
+                    int auth_number = Integer.parseInt(in.readLine());
+                    validated = validateUser(card_number, auth_number);
+                    if(validated){
+                        out.println(ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_AUTHENTICATION,1));
+                    }else{
+                        out.println(ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_AUTHENTICATION,2));
+                    }
 
-            validateUser();
-            out.println(""); 
-            inputLine = readLine();
-            int choise = Integer.parseInt(inputLine);
-            while (choise != 4) {
-                int deposit = 1;
-                switch (choise) {
-                case 2:
-                    deposit = -1
-                case 3:
-                    out.println("Enter amount: ");	
-                    inputLine= readLine();
-                    value = Integer.parseInt(inputLine);
-                    balance += deposit * value;
-                case 1:
-                    out.println("Current balance is " + balance + " dollars");  // 1 balance
-                    out.println("(1)Balance, (2)Withdrawal, (3)Deposit, (4)Exit"); // 2
-                    inputLine=readLine();
-                    choise = Integer.parseInt(inputLine);
-                    break;
-                case 4:
-                    break;
-                default: 
-                    break;
                 }
+                
             }
-            out.println("Good Bye");
+            /*while(false){
+                                
+            }*/
+
+
+
             out.close();
             in.close();
             socket.close();
         }catch (IOException e){
             e.printStackTrace();
         }
-   
-    }*/
-
+    
+    }
 }
