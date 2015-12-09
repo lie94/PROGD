@@ -17,12 +17,6 @@ public class ATMServerThread extends Thread {
         this.socket = socket;
     }
 
-    private String readLine() throws IOException {
-        String str = in.readLine();
-        //System.out.println(""  + socket + " : " + str);
-        return str;
-    }
-
     private boolean validateUser(String filename, int code, FileReader fileReader, BufferedReader bufferedReader, PrintWriter fileWriter) {
         try {
             fileReader = new FileReader(filename + ".txt");
@@ -60,18 +54,18 @@ public class ATMServerThread extends Thread {
             BufferedReader bufferedReader = null;
 
             while(!validated){
-                char temp [] = in.readLine().toCharArray()  ;
+                char temp [] = ProtocolHandler.readMessage(in);
+                
+
                 if(ProtocolHandler.getInstructionType(temp) == ProtocolHandler.TYPE_AUTHENTICATION && ProtocolHandler.getInstructionNumber(temp) == 1 ){ //Following this is the card number and authentication code
                     //String card_number = ProtocolHandler.charArrayToInt(in.readLine().toCharArray()) + "";
-                    char [] temp2 = in.readLine().toCharArray();
-                    System.out.println(temp2.length);
+                    char [] temp2 = ProtocolHandler.readMessage(in);
+                    System.out.println("Card number length: " + temp2.length);
                     for(char c : temp2){
                         System.out.println((int) c);
                     }
 
                     int auth_number = ProtocolHandler.charArrayToInt(in.readLine().toCharArray());
-                    System.out.println(card_number);
-                    System.out.println(auth_number);
                     validated = validateUser(card_number, auth_number, fileReader, bufferedReader, fileWriter);
                     if(validated){
                         filename = card_number + ".txt";

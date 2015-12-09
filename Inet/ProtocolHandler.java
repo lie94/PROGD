@@ -1,3 +1,5 @@
+import java.io.*;
+
 public class ProtocolHandler{
 	final static int TYPE_AUTHENTICATION = 0, TYPE_WITHDRAWAL = 1, TYPE_BALANCE = 2, TYPE_CLOSE = 3, TYPE_DEPOSIT = 4;
 	public static char[] intToCharArray(int value) {
@@ -23,7 +25,7 @@ public class ProtocolHandler{
 		return (message[0] << 8) + message[1];    	
     }
     public static int getInstructionNumber(char message []){
-    	return message[8];
+    	return message[9];
     }
 	public static char [] defineInstruction(final int instructionType, final int instructionNumber){
     	char temp [] = new char[10];
@@ -31,7 +33,18 @@ public class ProtocolHandler{
     	temp[0] = array[2];
     	temp[1] = array[3];
     	array = intToCharArray(instructionNumber);
-    	temp[8] = array[3];
+    	temp[9] = array[3];
+    	return temp;
+    }
+
+    public static char [] readMessage(BufferedReader in) throws IOException{
+    	in.mark(0);
+    	char temp [] = new char[10];
+    	while(in.read() != -1){};
+    	in.reset();
+    	int length = in.read(temp,0,10);
+    	System.out.println(length);
+
     	return temp;
     }
 }

@@ -53,13 +53,16 @@ public class ATMClient {
 
         boolean validated = false;
         while(!validated){
-        	out.println(ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_AUTHENTICATION, 1));
+        	char temp2 [] = ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_AUTHENTICATION, 1);
+        	for(char c: temp2)
+        		System.out.println((int)c);
+        	out.write(ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_AUTHENTICATION, 1));
         	System.out.println("Enter your card number: ");
         	System.out.print(INPUT_ARROW);
-        	out.println(ProtocolHandler.intToCharArray(scanner.nextInt()));
+        	out.write(ProtocolHandler.intToCharArray(scanner.nextInt()));
         	System.out.println("Enter your authentication number: ");
         	System.out.print(INPUT_ARROW);
-        	out.println(ProtocolHandler.intToCharArray(scanner.nextInt()));
+        	out.write(ProtocolHandler.intToCharArray(scanner.nextInt()));
         	char temp [] = in.readLine().toCharArray();
         	if(ProtocolHandler.getInstructionType(temp) == ProtocolHandler.TYPE_AUTHENTICATION && ProtocolHandler.getInstructionNumber(temp) == 1){
         		validated = true;
