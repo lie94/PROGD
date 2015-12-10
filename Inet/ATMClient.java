@@ -7,6 +7,7 @@ import java.util.Scanner;
 public class ATMClient {
     private static int connectionPort = 8989;
     private static String INPUT_ARROW = "> ";
+    private static String LANGUAGE_PATH = "client_language.txt"; 
     /**
      * Waits for the user to press enter before showing the next options
      */
@@ -18,22 +19,18 @@ public class ATMClient {
 
         }
     }
-    /**
-     * Displays all menu options. 
-     * input:
-     * String banner : A string containing the preferred banner to be shown.
-     */
-    public static void displayMenuOptions(String banner){
-    	System.out.println(banner);
-    	System.out.println("+-----------------------+");
-        System.out.println("| Choose a menu option: |");
-        System.out.println("+-----------------------+");
-        System.out.println("| 1. Balance\t\t|");
-        System.out.println("| 2. Withdrawal\t\t|");
-        System.out.println("| 3. Deposit\t\t|");
-        System.out.println("| 4. Change language\t|");
-        System.out.println("| 5. Exit\t\t|");
-        System.out.println("+-----------------------+");
+    public static void reciveLanguage(BufferedReader in){
+        try{
+            PrintWriter fileWriter = new PrintWriter(LANGUAGE_PATH);
+            String temp = in.readLine();
+            while(!temp.equals(ProtocolHandler.STRING_HAS_ENDED)){
+                fileWriter.println(temp);
+                temp = in.readLine();
+            }
+            fileWriter.close();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
     public static void main(String[] args) throws IOException {
         
@@ -41,7 +38,7 @@ public class ATMClient {
         PrintWriter out = null;
         BufferedReader in = null;
         String adress = "";
-        Language lang = new Language("client_language.txt");
+        Language lang = new Language(LANGUAGE_PATH);
         // Retrieve the IP from the terminal
         try {
             adress = args[0];
@@ -139,10 +136,13 @@ public class ATMClient {
                 int language;
                 language = scanner.nextInt(); 
                 if(language > 0 && language < 3){
+                    // Create an instruction requesting a new language
+                    ProtocolHandler.writeInstruction(out, ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_LANGUAGE, language));
+                    reciveLanguage(in);
+                    lang = new Language(LANGUAGE_PATH);
+                }else{ 
+                    // Out of bounds index
                     System.out.println(lang.changeLanguage[1]);
-                }else{
-                    // Skapa en instruktion som vill skicka över skiten
-                    
                 }
         		break;
         	case 5:    // Close the client and server thread

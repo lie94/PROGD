@@ -1,7 +1,8 @@
 import java.io.*;
 
 public class ProtocolHandler{
-	final static int TYPE_AUTHENTICATION = 0, TYPE_WITHDRAWAL = 1, TYPE_BALANCE = 2, TYPE_CLOSE = 3, TYPE_DEPOSIT = 4;
+	final static int TYPE_AUTHENTICATION = 0, TYPE_WITHDRAWAL = 1, TYPE_BALANCE = 2, TYPE_CLOSE = 3, TYPE_DEPOSIT = 4, TYPE_LANGUAGE = 5;
+	final static String STRING_HAS_ENDED = "-";
 	public static char[] intToCharArray(int value) {
 	    return new char[] {
 	            (char) (value >>> 24),

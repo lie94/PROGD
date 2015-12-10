@@ -41,7 +41,23 @@ public class ATMServerThread extends Thread {
         }
     }
 
-    
+    private void sendLanguage(BufferedReader read_local_language, PrintWriter out){
+        try{
+            String temp = read_local_language.readLine();
+            while(temp != null){
+                out.println(temp);
+                /*if(temp.isEmpty()){
+                    out.println(ProtocolHandler.IS_EMPTY_STRING);
+                }else{
+                    out.println(temp);
+                }*/
+                temp = read_local_language.readLine();     
+            }
+            out.println(ProtocolHandler.STRING_HAS_ENDED);
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
     public void run(){
          
@@ -68,7 +84,8 @@ public class ATMServerThread extends Thread {
                         ProtocolHandler.writeInstruction(out,ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_AUTHENTICATION,1));
                     }else{
                         ProtocolHandler.writeInstruction(out,ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_AUTHENTICATION,2));
-                    }
+                    }   
+
 
                 }
                 
@@ -77,6 +94,7 @@ public class ATMServerThread extends Thread {
             boolean running = true;
             while(running){ 
                 char [] instruction = ProtocolHandler.readInstruction(in);
+                ProtocolHandler.printMessage(instruction);
                 switch(ProtocolHandler.getInstructionType(instruction)){
                 case ProtocolHandler.TYPE_BALANCE:
                     fileReader = new FileReader(filename);
@@ -84,6 +102,7 @@ public class ATMServerThread extends Thread {
                     bufferedReader.readLine(); // We don't need information from the first line
                     int balance = Integer.parseInt(bufferedReader.readLine());
                     ProtocolHandler.writeInt(out,balance);    
+                    fileReader.close();
                     break;
                 case ProtocolHandler.TYPE_CLOSE:
                     running = false;
@@ -117,10 +136,28 @@ public class ATMServerThread extends Thread {
                         fileWriter = new PrintWriter(filename);
                         fileWriter.println(iter + 1);
                         fileWriter.println(old_balance - withdraw_amount);
-                        fileWriter.close();
                     }else{
                         ProtocolHandler.writeInstruction(out,ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_WITHDRAWAL,2));
                     }
+                    fileWriter.close();
+                    bufferedReader.close();
+                    break;
+                case ProtocolHandler.TYPE_LANGUAGE:
+                    System.out.println("TEST0");
+                    // English
+                    if(ProtocolHandler.getInstructionNumber(instruction) == 1){
+                        fileReader = new FileReader("standard_english.txt");
+                    // Swedish
+                    }else if(ProtocolHandler.getInstructionNumber(instruction) == 2){
+                        fileReader = new FileReader("standard_swedish.txt");
+                    }else{
+                        System.err.println("IMPOSSIBLE CLIENT REQUEST TYPE_LANGUAGE");
+                        break;
+                    }
+                    bufferedReader = new BufferedReader(fileReader);
+                    System.out.println("TEST1");
+                    sendLanguage(bufferedReader,out);
+                    System.out.println("TEST2");
                     break;
                 default:
                     ProtocolHandler.printMessage(instruction);
