@@ -42,4 +42,4 @@ Fel valideringskod.
 | 2. Svenska         |
 +--------------------+
 
-Välj ett menyval mellan 1 och 5.
+Välj ett menyval mellan 1 och 2.

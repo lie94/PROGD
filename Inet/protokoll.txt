@@ -63,8 +63,10 @@ Deposit:
 
 
 Updatera strängar:
-	Server Instructions:
-	0x00 
+	Client Instruction:
+		Jag vill ha ett nytt språk i klienten. ID:t på språket jag vill ha följer med som instruktionsid.
+		Exempel 0x00 05 - 01 betyder att jag vill ha engelska och 0x00 05 - 02 används för svenska
+		0x00 05 - LANGUAGEID
 
 int temp = 1341515;
 char array[4];

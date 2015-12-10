@@ -41,7 +41,7 @@ public class ATMClient {
         PrintWriter out = null;
         BufferedReader in = null;
         String adress = "";
-        Language lang = new Language("client_language.txt");
+        Language lang = new Language("standard_client_language.txt");
         // Retrieve the IP from the terminal
         try {
             adress = args[0];
@@ -122,14 +122,14 @@ public class ATMClient {
                     temp = ProtocolHandler.readInstruction(in);
                     // if the withdrawal-amount was larger then the current balance
                     if(ProtocolHandler.getInstructionType(temp) == ProtocolHandler.TYPE_WITHDRAWAL && ProtocolHandler.getInstructionNumber(temp) == 4){ 
-                        System.out.println(lang.withdrawal[2]);
+                        System.out.println(withdrawal[2]);
                     // if the withdrawalamount was small enough
                     }else{     
-                        System.out.println(lang.withdrawal[3]);
+                        System.out.println(withdrawal[3]);
                     }
                 //if the authenticationcode was incorrect
                 }else{ 
-                    System.out.println(lang.withdrawal[4]);
+                    System.out.println(withdrawal[4]);
                 }
                 pressEnterToContinue(scanner);
         		break;
@@ -137,12 +137,14 @@ public class ATMClient {
         		System.out.println(lang.changeLanguage[0]);
                 System.out.print(INPUT_ARROW);
                 int language;
-                language = scanner.nextInt(); 
-                if(language > 0 && language < 3){
-                    System.out.println(lang.changeLanguage[1]);
-                }else{
-                    // Skapa en instruktion som vill skicka över skiten
-                    
+                do{
+                    language = scanner.nextInt(); 
+                    if(language > 0 && language < 3){
+                        System.out.println(lang.changeLanguage[1]);
+                    }
+                }while(language > 0 && language < 3);
+                if(language != lang.getLanguageID()){
+                    System.out.println("Nu byter vi språk ;)");
                 }
         		break;
         	case 5:    // Close the client and server thread
@@ -165,6 +167,7 @@ public class ATMClient {
         public String withdrawal [];
         public String balance [];
         public String changeLanguage [];
+        private int language;
 
         public Language(String filepath){
             try {
@@ -182,6 +185,7 @@ public class ATMClient {
                 addStrings(withdrawal,bufferedReader);
                 changeLanguage = new String[2];
                 addStrings(changeLanguage, bufferedReader);
+                version = 0;
                 fileReader.close();
                 bufferedReader.close();
             } catch(Exception e){
@@ -202,6 +206,9 @@ public class ATMClient {
         public String getBanner(BufferedReader in, PrintWriter out){
             return "DU ÄR EN COOL SNUBBE/SNUBBINA";
         
+        }
+        public int getLanguageID(){
+            return language;
         }
     }
 }   
