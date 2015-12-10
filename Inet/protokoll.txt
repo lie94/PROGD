@@ -30,12 +30,23 @@ Authentication:
 		Du är inte authenticated, försök igen
 		0x 00 00 - 02
 
+
+
 !!Alla instruktioner förutom authentication kräver ett ID i början av instruktionen.!!
 
 Withdrawing:
 	Client Instructions:
-		Läs två ints, en sifferkod och en som berättar hur mycket som ska dras ut
+		Läs en int, svara om den är korrekt kod eller inte, sedan ta emot en ny int med hur mycket som ska tas ut
 		0x00 01 - 01
+	Server Instructions:
+		Koden jag fick var korrekt, lägg in hur mycket du vill ta ut.
+		0x00 01 - 01 
+		Koden jag fick var inkorrekt, försök igen.
+		0x00 01 - 02
+		Du får ta ut så mycket, jag skickar med inten efter
+		0x00 01 - 03
+		Du får inte ta ut så mycket
+		0x00 01 - 04
 Balance:
 	Client Instruction:
 		Nästa sak som servern skickar är hur mycket pengar klienten har.

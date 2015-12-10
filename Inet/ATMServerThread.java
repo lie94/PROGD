@@ -16,7 +16,9 @@ public class ATMServerThread extends Thread {
         super("ATMServerThread");
         this.socket = socket;
     }
-
+    /**
+     * Validates the user if the username is 
+     */
     private boolean validateUser(String filename, int code, FileReader fileReader, BufferedReader bufferedReader, PrintWriter fileWriter) {
         try {
             fileReader = new FileReader(filename + ".txt");
@@ -37,7 +39,6 @@ public class ATMServerThread extends Thread {
         } catch(Exception e) {
             return false;
         }
-    
     }
 
     
@@ -52,50 +53,45 @@ public class ATMServerThread extends Thread {
             FileReader fileReader = null; 
             PrintWriter fileWriter = null; 
             BufferedReader bufferedReader = null;
-
+            
+            // Validate user credentials
             while(!validated){
-                char temp [] = ProtocolHandler.readMessage(in);
-                
-
+                char temp [] = ProtocolHandler.readInstruction(in);
+                // If it is an instruction message
                 if(ProtocolHandler.getInstructionType(temp) == ProtocolHandler.TYPE_AUTHENTICATION && ProtocolHandler.getInstructionNumber(temp) == 1 ){ //Following this is the card number and authentication code
-                    //String card_number = ProtocolHandler.charArrayToInt(in.readLine().toCharArray()) + "";
-                    char [] temp2 = ProtocolHandler.readMessage(in);
-                    System.out.println("Card number length: " + temp2.length);
-                    for(char c : temp2){
-                        System.out.println((int) c);
-                    }
-
-                    int auth_number = ProtocolHandler.charArrayToInt(in.readLine().toCharArray());
+                    String card_number = ProtocolHandler.readInt(in) + "";
+                    int auth_number = ProtocolHandler.readInt(in);
                     validated = validateUser(card_number, auth_number, fileReader, bufferedReader, fileWriter);
+                    // If the 
                     if(validated){
                         filename = card_number + ".txt";
-                        out.println(ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_AUTHENTICATION,1));
+                        ProtocolHandler.writeInstruction(out,ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_AUTHENTICATION,1));
                     }else{
-                        out.println(ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_AUTHENTICATION,2));
+                        ProtocolHandler.writeInstruction(out,ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_AUTHENTICATION,2));
                     }
 
                 }
                 
-            }
-            fileReader = new FileReader(filename);
-            bufferedReader = new BufferedReader(fileReader);
-            bufferedReader.mark(0);
+            } 
+
             boolean running = true;
             while(running){ 
-                char [] instruction = in.readLine().toCharArray();
+                char [] instruction = ProtocolHandler.readInstruction(in);
                 switch(ProtocolHandler.getInstructionType(instruction)){
                 case ProtocolHandler.TYPE_BALANCE:
-                    bufferedReader.reset();
+                    fileReader = new FileReader(filename);
+                    bufferedReader = new BufferedReader(fileReader);
                     bufferedReader.readLine(); // We don't need information from the first line
-                    int temp = Integer.parseInt(bufferedReader.readLine());
-                    out.println(ProtocolHandler.intToCharArray(temp));    
+                    int balance = Integer.parseInt(bufferedReader.readLine());
+                    ProtocolHandler.writeInt(out,balance);    
                     break;
                 case ProtocolHandler.TYPE_CLOSE:
                     running = false;
                     break;
                 case ProtocolHandler.TYPE_DEPOSIT:
-                    bufferedReader.reset();
-                    int added_amount = ProtocolHandler.charArrayToInt(in.readLine().toCharArray());
+                    fileReader = new FileReader(filename);
+                    bufferedReader = new BufferedReader(fileReader);
+                    int added_amount = ProtocolHandler.readInt(in);
                     String line1 = bufferedReader.readLine();
                     int current_amount = Integer.parseInt(bufferedReader.readLine());
                     fileWriter = new PrintWriter(filename);
@@ -103,8 +99,32 @@ public class ATMServerThread extends Thread {
                     fileWriter.println((current_amount + added_amount) + "");
                     fileWriter.close();
                     break;
+                case ProtocolHandler.TYPE_WITHDRAWAL:
+                    fileReader = new FileReader(filename);  
+                    bufferedReader = new BufferedReader(fileReader);
+                    int iter = Integer.parseInt(bufferedReader.readLine());
+                    int test_code = ProtocolHandler.readInt(in);                // Read possible authentication code
+                    if(test_code == iter * 2 - 1){
+                        ProtocolHandler.writeInstruction(out,ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_WITHDRAWAL,1));
+                        int withdraw_amount = ProtocolHandler.readInt(in);
+                        int old_balance = Integer.parseInt(bufferedReader.readLine());
+                        if(withdraw_amount > old_balance){
+                            withdraw_amount = 0;
+                            ProtocolHandler.writeInstruction(out,ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_WITHDRAWAL,4));
+                        }else{
+                            ProtocolHandler.writeInstruction(out,ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_WITHDRAWAL,3));
+                        }
+                        fileWriter = new PrintWriter(filename);
+                        fileWriter.println(iter + 1);
+                        fileWriter.println(old_balance - withdraw_amount);
+                        fileWriter.close();
+                    }else{
+                        ProtocolHandler.writeInstruction(out,ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_WITHDRAWAL,2));
+                    }
+                    break;
                 default:
-                    System.err.println(instruction);
+                    ProtocolHandler.printMessage(instruction);
+                    //running = false;
                 }
             }
             bufferedReader.close();               

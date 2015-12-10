@@ -1,0 +1,8 @@
+Välkommen till Banken
+
+Skriv sedan i kortnumret
+
+Ge autentiseringkod
+
+Ansluter till banken...
+
