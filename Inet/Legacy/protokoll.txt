@@ -1,0 +1,63 @@
+Protokoll:
+Typ av instruktion   Utökning av protokoll	  Nr på instuktionen	
+| 00 00 			|00 00 00 00 		| 00 
+Sändande av information.
+	Alla ints som skickars mellan servern och klienten konverteras innan de sänds till char arrays, och konverteras tillbaka till ints när de kommer fram
+	Konvertering från int till chararray:
+		char array [] = {Sista 4 bitarna, Näst sista 4 bitarna, näst första 4 bitarna, första 4 bitarna}
+	Konvertering från chararray till int:
+		int integer = array[0] + (array[1] <<< 8) + (array[2] <<< 16) + (array[3] <<< 24);
+
+Authentication:
+	Typ: 00 00
+	Client Instruktion:
+		Läs två ints som följer. Första är kortnummret, andra är sifferkoden. 
+		0x 00 00 - 01
+
+	Server Instructions:
+		Du är authenticated
+		0x 00 00 - 01
+		
+		Du är inte authenticated, försök igen
+		0x 00 00 - 02
+
+
+Withdrawing:
+	Client Instructions:
+		Läs en int, svara om den är korrekt kod eller inte, sedan ta emot en ny int med hur mycket som ska tas ut
+		0x00 01 - 01
+	Server Instructions:
+		Koden jag fick var korrekt, lägg in hur mycket du vill ta ut.
+		0x00 01 - 01 
+		Koden jag fick var inkorrekt, försök igen.
+		0x00 01 - 02
+		Du får ta ut så mycket, jag skickar med inten efter
+		0x00 01 - 03
+		Du får inte ta ut så mycket
+		0x00 01 - 04
+Balance:
+	Client Instruction:
+		Nästa sak som servern skickar är hur mycket pengar klienten har.
+		0x00 02 - 01
+
+Close:
+	Client Instruction:
+		Servern och klienten ska stängas av.
+		0x00 03 - 01
+Deposit:
+	Client Instruction:
+		Lägg in pengar enligt nästa int jag skickar in
+		0x00 04 - 01
+
+
+Updatera strängar:
+	Client Instruction:
+		Jag vill ha ett nytt språk i klienten. ID:t på språket jag vill ha följer med som instruktionsid.
+		Exempel 0x00 05 - 01 betyder att jag vill ha engelska och 0x00 05 - 02 används för svenska
+		Läs varje rad som ny rad tills vi kommer till en "-" sträng
+		0x00 05 - LANGUAGEID
+
+Updatera Välkommsmeddelande:
+	Client Instruction:
+		Jag vill hämta det nya välkommsmeddelandet.
+		0x00 06 - 01

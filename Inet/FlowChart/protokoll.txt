@@ -1,12 +1,3 @@
-All data som skickas börjar med en instruktion. Den beskriver hur
-informationen som kommer efter ska tolkas. Man fortsätter tolka tills man
-kommer till en null message.
-
-
-char temp[10];
-temp[0] = 0 - (2^8 - 1)
-temp[1] = 2^16 - 1 
-
 Protokoll:
 Typ av instruktion   Utökning av protokoll	  Nr på instuktionen	
 | 00 00 			|00 00 00 00 		| 00 
@@ -30,9 +21,6 @@ Authentication:
 		Du är inte authenticated, försök igen
 		0x 00 00 - 02
 
-
-
-!!Alla instruktioner förutom authentication kräver ett ID i början av instruktionen.!!
 
 Withdrawing:
 	Client Instructions:
@@ -66,16 +54,11 @@ Updatera strängar:
 	Client Instruction:
 		Jag vill ha ett nytt språk i klienten. ID:t på språket jag vill ha följer med som instruktionsid.
 		Exempel 0x00 05 - 01 betyder att jag vill ha engelska och 0x00 05 - 02 används för svenska
+		Läs varje rad som ny rad tills vi kommer till en "-" sträng
 		0x00 05 - LANGUAGEID
 
-int temp = 1341515;
-char array[4];
-INSTUKTION //LÄS ALLA RADER SOM SAMMA INT, KONKATINERA DEM
-INT
-NULL
-INSTRUKTION	//LÄS ALLA RADER SOM VARSIN INT
-INT
-INT
-INT
-INT
-NULL
+Updatera Välkommsmeddelande:
+	Client Instruction:
+		Jag vill hämta det nya välkommsmeddelandet.
+		Läs varje rad som ny rad tills vi kommer till en "-" sträng
+		0x00 06 - 01

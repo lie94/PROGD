@@ -32,6 +32,21 @@ public class ATMClient {
             e.printStackTrace();
         }
     }
+
+    public static String reciveMessage(BufferedReader in){
+        String banner = "";
+        try{
+            String temp = in.readLine();
+            while(!temp.equals(ProtocolHandler.STRING_HAS_ENDED)){
+                banner += temp + "\n";
+                temp = in.readLine();
+            }
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        return banner;
+    }
+
     public static void main(String[] args) throws IOException {
         
         Socket ATMSocket = null;
@@ -200,7 +215,8 @@ public class ATMClient {
             }
         }
         public String getBanner(BufferedReader in, PrintWriter out){
-            return "DU ÄR EN COOL SNUBBE/SNUBBINA";
+            ProtocolHandler.writeInstruction(out,ProtocolHandler.defineInstruction(ProtocolHandler.TYPE_BANNER, 1));
+            return reciveMessage(in);
         
         }
     }

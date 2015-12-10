@@ -1,0 +1,45 @@
+Welcome to the bank!
+Contacting bank ... 
+
+Enter your card number: 
+
+Enter your authentication number: 
+
+Wrong information, try again.
+
++-----------------------+
+| Choose a menu option: |
++-----------------------+
+| 1. Balance            |
+| 2. Withdrawal         |
+| 3. Deposit            |
+| 4. Change language    |
+| 5. Exit               |
++-----------------------+
+
+Must choose a menu option between 1 and 5.
+
+Your balance is: 
+
+Enter the amount to deposit:
+
+Money deposited.
+
+Enter the authentication code: 
+
+Enter amount to withdraw: 
+
+You do not have that much money on the account.
+
+Withdrawal made.
+
+Wrong authentication code.
+
++--------------------+
+| Choose a language: |
++--------------------+
+| 1. English         |
+| 2. Swedish         |
++--------------------+
+
+Must choose a menu option between 1 and 2.
