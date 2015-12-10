@@ -1,0 +1,45 @@
+Välkommen till banken!
+Kontaktar banken ... 
+
+Skriv in ditt kortnummer: 
+
+Skriv in din valideringskod: 
+
+Fel information, försök igen.
+
++-----------------------+
+| Välj ett menyval:     |
++-----------------------+
+| 1. Balans             |
+| 2. Tag ut pengar      |
+| 3. Sätta in pengar    |
+| 4. Ändra språk        |
+| 5. Avsluta            |
++-----------------------+
+
+Välj ett menyval mellan 1 och 5.
+
+Din balans är: 
+
+Skriv hur mycket du vill sätta in:
+
+Pengar insatta.
+
+Skriv din valideringskod: 
+
+Skriv hur mycket du vill ta ut: 
+
+Du har inte så mycket pengar på kontot.
+
+Uttag gjort.
+
+Fel valideringskod.
+
++--------------------+
+| Välj ett språk:    |
++--------------------+
+| 1. Engelska        |
+| 2. Svenska         |
++--------------------+
+
+Välj ett menyval mellan 1 och 5.
