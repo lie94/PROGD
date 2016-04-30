@@ -1,0 +1,3 @@
+Alfabeticspam: C, Haskell
+FlexibleSpaces: Haskell, Prolog
+Pebblesolitary: C, Prolog
