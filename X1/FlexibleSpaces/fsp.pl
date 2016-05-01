@@ -1,27 +1,39 @@
-
-
-
+%Authur Jonathan Rinnarv
+%		Felix Hedenström
 
 [kattio].
 
 main :-
 	read_int(W), read_int(P),
+	removeSingeltonError(P),
 	getArray(New_walls),
-	write(W),
-	write(P),
 	append(New_walls,[W],All_walls),
 	solve(All_walls, [0|All_walls], Solution),
-	write(Solution).
+	sort(Solution, Z),
+	atomic_list_concat(Z, ' ', S),
+	write(S), nl.
 
+removeSingeltonError(P):- 
+		P > 0,
+		!.
 
-solve([], _, [3]):- !.
+solve([], _, []):- !.
 
-solve([T|H], OriginalList, Solution):-
-	member(A,OriginalList),
-	A < T,
-	Z is T - A,
-	%not(member(Z, TempSolution)),
-	solve(H, OriginalList, [Z|Solution]).
+solve([H|T], OriginalList, NewSolution):-
+	getAllLengths(H, OriginalList, Z),
+	append(Z, Solution, NewSolution),
+	solve(T, OriginalList, Solution).
+
+getAllLengths(_, [], []):- !.
+
+getAllLengths(X, [H|T], [Z|Result]):-
+	H < X,
+	!,
+	Z is X - H,
+	getAllLengths(X, T, Result).
+
+getAllLengths(X, [_|T], Result):-
+	getAllLengths(X, T, Result).
 
 getArray(T):-
 			read_int(P),
@@ -36,11 +48,12 @@ helpGetArray(P,[P|T]):-
 			!,
 			helpGetArray(Q,T).
 
+%appendUnique([], OriginalList, OriginalList):- !.
 
+%appendUnique([H|T], OriginalList, [H|Result]):-
+%	not(member(H, OriginalList)),
+%	!,
+%	appendUnique(T, OriginalList, Result).
 
-%			(P == end_of_file,
-%			T = []);
-%			getArray(T).
-%solve(X, Y) :- 
-% Z is abs(X-Y),
-% write(Z), nl.
+%appendUnique([_|T], OriginalList, Result):-
+%	appendUnique(T, OriginalList, Result).
