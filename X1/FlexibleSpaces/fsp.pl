@@ -47,13 +47,3 @@ helpGetArray(P,[P|T]):-
 			read_int(Q),
 			!,
 			helpGetArray(Q,T).
-
-%appendUnique([], OriginalList, OriginalList):- !.
-
-%appendUnique([H|T], OriginalList, [H|Result]):-
-%	not(member(H, OriginalList)),
-%	!,
-%	appendUnique(T, OriginalList, Result).
-
-%appendUnique([_|T], OriginalList, Result):-
-%	appendUnique(T, OriginalList, Result).
