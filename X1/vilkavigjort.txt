@@ -1,0 +1,9 @@
+Alphabet Spam:
+	C: 			1152647
+	Haskell:	1152644
+Flexible Spaces:
+	Prolog: 	1152638
+	Haskell: 	1152630
+Pebble Solitaire:
+	C:			1152626
+	Prolog: 	1152618
